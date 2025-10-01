@@ -7,6 +7,14 @@ import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
+// Verifier contract interface for different proof types
+interface IZKVerifier {
+    function verifyProof(
+        bytes calldata proof,
+        uint256[] calldata publicInputs
+    ) external view returns (bool);
+}
+
 /**
  * @title P2PIdentityRegistry
  * @dev Gas-optimized smart contract for P2P zero-knowledge identity verification
@@ -38,14 +46,6 @@ contract P2PIdentityRegistry is
         bytes32 nullifierHash;  // Anti-replay nullifier
         bytes32 commitment;     // Identity commitment
         uint32 timestamp;       // Proof generation timestamp
-    }
-
-    // Verifier contract interface for different proof types
-    interface IZKVerifier {
-        function verifyProof(
-            bytes calldata proof,
-            uint256[] calldata publicInputs
-        ) external view returns (bool);
     }
 
     // Registry state
