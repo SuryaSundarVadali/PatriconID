@@ -38,6 +38,10 @@ contract P2PIdentityRegistry is
     error TooManyProofs(uint256 count);
     error ProofExpired(bytes32 proofHash);
     error UnauthorizedUpgrade();
+    error PublicInputsLengthMismatch();
+    error SignaturesLengthMismatch();
+    error NullifiersLengthMismatch();
+    error CommitmentsLengthMismatch();
 
     // Gas-optimized proof structure
     struct ZKProof {
@@ -113,19 +117,12 @@ contract P2PIdentityRegistry is
         }
 
         // Verify ZK proof using appropriate verifier contract
-        IZKVerifier verifier = IZKVerifier(verifierContracts[proofType]);
-        bool proofValid = verifier.verifyProof(proof, publicInputs);
-        if (!proofValid) {
+        if (!IZKVerifier(verifierContracts[proofType]).verifyProof(proof, publicInputs)) {
             revert InvalidZKProof();
         }
 
         // Verify passkey signature for non-transferability
-        bool signatureValid = _verifyPasskeySignature(
-            keccak256(proof),
-            passkeySignature,
-            msg.sender
-        );
-        if (!signatureValid) {
+        if (!_verifyPasskeySignature(keccak256(proof), passkeySignature, msg.sender)) {
             revert InvalidPasskeySignature();
         }
 
@@ -171,8 +168,22 @@ contract P2PIdentityRegistry is
         if (proofs.length > 10) {
             revert TooManyProofs(proofs.length);
         }
-
+    
         bool[] memory results = new bool[](proofs.length);
+        
+        // Pre-validate array lengths
+        if (proofs.length != publicInputs.length) {
+            revert PublicInputsLengthMismatch();
+        }
+        if (proofs.length != passkeySignatures.length) {
+            revert SignaturesLengthMismatch();
+        }
+        if (proofs.length != nullifierHashes.length) {
+            revert NullifiersLengthMismatch();
+        }
+        if (proofs.length != commitments.length) {
+            revert CommitmentsLengthMismatch();
+        }
         
         for (uint256 i = 0; i < proofs.length; i++) {
             // Skip if nullifier already used
@@ -180,22 +191,76 @@ contract P2PIdentityRegistry is
                 results[i] = false;
                 continue;
             }
-
-            try this.verifyP2PProof(
+            
+            // Skip if invalid proof type
+            if (proofTypes[i] < 1 || proofTypes[i] > 5) {
+                results[i] = false;
+                continue;
+            }
+            
+            // Skip if verifier not set
+            if (verifierContracts[proofTypes[i]] == address(0)) {
+                results[i] = false;
+                continue;
+            }
+            
+            results[i] = _verifyProofInternal(
                 proofs[i],
                 publicInputs[i],
                 passkeySignatures[i],
                 proofTypes[i],
                 nullifierHashes[i],
                 commitments[i]
-            ) {
-                results[i] = true;
-            } catch {
-                results[i] = false;
-            }
+            );
         }
         
         return results;
+    }
+    
+    /**
+     * @notice Internal proof verification to avoid stack too deep
+     */
+    function _verifyProofInternal(
+        bytes calldata proof,
+        uint256[] calldata publicInputs,
+        bytes calldata passkeySignature,
+        uint8 proofType,
+        bytes32 nullifierHash,
+        bytes32 commitment
+    ) internal returns (bool) {
+        // Verify ZK proof
+        if (!IZKVerifier(verifierContracts[proofType]).verifyProof(proof, publicInputs)) {
+            return false;
+        }
+    
+        // Verify passkey signature
+        if (!_verifyPasskeySignature(keccak256(proof), passkeySignature, msg.sender)) {
+            return false;
+        }
+    
+        // Mark nullifier as used
+        usedNullifiers[nullifierHash] = true;
+    
+        // Create and store proof record in one step
+        bytes32 proofHash = keccak256(abi.encodePacked(proof, block.timestamp, msg.sender));
+        userProofs[msg.sender][proofType] = proofHash;
+        proofTimestamps[proofHash] = block.timestamp;
+    
+        // Register commitment if not already done
+        if (!verifiedCommitments[commitment]) {
+            verifiedCommitments[commitment] = true;
+            emit CommitmentRegistered(commitment, msg.sender, uint32(block.timestamp));
+        }
+    
+        emit ProofVerified(
+            msg.sender,
+            proofType,
+            proofHash,
+            nullifierHash,
+            uint32(block.timestamp)
+        );
+    
+        return true;
     }
 
     /**
