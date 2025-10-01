@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/patriconid-logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="PatriconID - P2P Decentralized Identity Verification with Zero-Knowledge Proofs" />
+    <meta name="keywords" content="decentralized identity, zero-knowledge, privacy, verification, P2P, web3, blockchain, DeFi" />
+    <meta name="author" content="PatriconID Team" />
+    <title>PatriconID - P2P Identity Verification</title>
+    
+    <!-- Web3 / DeFi specific meta tags -->
+    <meta property="og:title" content="PatriconID - Privacy-First Identity Verification" />
+    <meta property="og:description" content="Generate and verify identity proofs without revealing personal data using zero-knowledge technology." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/patriconid-social.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="PatriconID - P2P Identity Verification" />
+    <meta name="twitter:description" content="Privacy-first identity verification for the decentralized web" />
+    
+    <!-- PWA metadata -->
+    <meta name="theme-color" content="#00ff9d" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Security headers for WASM and SharedArrayBuffer -->
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" as="script" href="data:application/octet-stream;base64,aW1wb3J0IFJlYWN0IGZyb20gJ3JlYWN0JwppbXBvcnQgUmVhY3RET00gZnJvbSAncmVhY3QtZG9tL2NsaWVudCcKaW1wb3J0IEFwcCBmcm9tICcuL0FwcCcKaW1wb3J0ICcuL2luZGV4LmNzcycKCi8vIEluaXRpYWxpemUgc2VydmljZSB3b3JrZXIgZm9yIFBXQSBmdW5jdGlvbmFsaXR5CmlmICgnc2VydmljZVdvcmtlcicgaW4gbmF2aWdhdG9yKSB7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ2xvYWQnLCAoKSA9PiB7CiAgICBuYXZpZ2F0b3Iuc2VydmljZVdvcmtlci5yZWdpc3RlcignL3N3LmpzJykKICAgICAgLnRoZW4oKHJlZ2lzdHJhdGlvbikgPT4gewogICAgICAgIGNvbnNvbGUubG9nKCdTVyByZWdpc3RlcmVkOiAnLCByZWdpc3RyYXRpb24pCiAgICAgIH0pCiAgICAgIC5jYXRjaCgocmVnaXN0cmF0aW9uRXJyb3IpID0+IHsKICAgICAgICBjb25zb2xlLmxvZygnU1cgcmVnaXN0cmF0aW9uIGZhaWxlZDogJywgcmVnaXN0cmF0aW9uRXJyb3IpCiAgICAgIH0pCiAgfSkKfQoKLy8gRXJyb3IgYm91bmRhcnkgZm9yIHRoZSBlbnRpcmUgYXBwCmNsYXNzIEVycm9yQm91bmRhcnkgZXh0ZW5kcyBSZWFjdC5Db21wb25lbnQ8CiAgeyBjaGlsZHJlbjogUmVhY3QuUmVhY3ROb2RlIH0sCiAgeyBoYXNFcnJvcjogYm9vbGVhbjsgZXJyb3I/OiBFcnJvciB9Cj4gewogIGNvbnN0cnVjdG9yKHByb3BzOiB7IGNoaWxkcmVuOiBSZWFjdC5SZWFjdE5vZGUgfSkgewogICAgc3VwZXIocHJvcHMpCiAgICB0aGlzLnN0YXRlID0geyBoYXNFcnJvcjogZmFsc2UgfQogIH0KCiAgc3RhdGljIGdldERlcml2ZWRTdGF0ZUZyb21FcnJvcihlcnJvcjogRXJyb3IpIHsKICAgIHJldHVybiB7IGhhc0Vycm9yOiB0cnVlLCBlcnJvciB9CiAgfQoKICBjb21wb25lbnREaWRDYXRjaChlcnJvcjogRXJyb3IsIGVycm9ySW5mbzogUmVhY3QuRXJyb3JJbmZvKSB7CiAgICBjb25zb2xlLmVycm9yKCdBcHAgZXJyb3I6JywgZXJyb3IsIGVycm9ySW5mbykKICB9CgogIHJlbmRlcigpIHsKICAgIGlmICh0aGlzLnN0YXRlLmhhc0Vycm9yKSB7CiAgICAgIHJldHVybiAoCiAgICAgICAgPGRpdiBzdHlsZT17ewogICAgICAgICAgZGlzcGxheTogJ2ZsZXgnLAogICAgICAgICAgZmxleERpcmVjdGlvbjogJ2NvbHVtbicsCiAgICAgICAgICBhbGlnbkl0ZW1zOiAnY2VudGVyJywKICAgICAgICAgIGp1c3RpZnlDb250ZW50OiAnY2VudGVyJywKICAgICAgICAgIG1pbkhlaWdodDogJzEwMHZoJywKICAgICAgICAgIHBhZGRpbmc6ICcyMHB4JywKICAgICAgICAgIHRleHRBbGlnbjogJ2NlbnRlcicsCiAgICAgICAgICBiYWNrZ3JvdW5kOiAnbGluZWFyLWdyYWRpZW50KDEzNWRlZywgIzY2N2VlYSAwJSwgIzc2NGJhMiAxMDAlKScsCiAgICAgICAgICBjb2xvcjogJ3doaXRlJwogICAgICAgIH19PgogICAgICAgICAgPGgxPlNvbWV0aGluZyB3ZW50IHdyb25nPC9oMT4KICAgICAgICAgIDxwPlBsZWFzZSByZWZyZXNoIHRoZSBwYWdlIG9yIGNvbnRhY3Qgc3VwcG9ydCBpZiB0aGUgcHJvYmxlbSBwZXJzaXN0cy48L3A+CiAgICAgICAgICA8YnV0dG9uIAogICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiB3aW5kb3cubG9jYXRpb24ucmVsb2FkKCl9CiAgICAgICAgICAgIHN0eWxlPXt7CiAgICAgICAgICAgICAgcGFkZGluZzogJzEwcHggMjBweCcsCiAgICAgICAgICAgICAgbWFyZ2luOiAnMjBweCcsCiAgICAgICAgICAgICAgYm9yZGVyOiAnbm9uZScsCiAgICAgICAgICAgICAgYm9yZGVyUmFkaXVzOiAnNXB4JywKICAgICAgICAgICAgICBiYWNrZ3JvdW5kOiAnd2hpdGUnLAogICAgICAgICAgICAgIGNvbG9yOiAnIzY2N2VlYScsCiAgICAgICAgICAgICAgY3Vyc29yOiAncG9pbnRlcicKICAgICAgICAgICAgfX0KICAgICAgICAgID4KICAgICAgICAgICAgUmVmcmVzaCBQYWdlCiAgICAgICAgICA8L2J1dHRvbj4KICAgICAgICA8L2Rpdj4KICAgICAgKQogICAgfQoKICAgIHJldHVybiB0aGlzLnByb3BzLmNoaWxkcmVuCiAgfQp9CgpSZWFjdERPTS5jcmVhdGVSb290KGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyb290JykhKS5yZW5kZXIoCiAgPFJlYWN0LlN0cmljdE1vZGU+CiAgICA8RXJyb3JCb3VuZGFyeT4KICAgICAgPEFwcCAvPgogICAgPC9FcnJvckJvdW5kYXJ5PgogIDwvUmVhY3QuU3RyaWN0TW9kZT4sCik=" />
+    
+    <style>
+      /* Critical loading styles with web3 theme */
+      body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background: #0a0a0a;
+        background-image: 
+          radial-gradient(circle at 25% 25%, #1a1a2e 0%, transparent 50%),
+          radial-gradient(circle at 75% 75%, #16213e 0%, transparent 50%);
+        color: #ffffff;
+      }
+      
+      #root {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .loading {
+        text-align: center;
+        color: white;
+      }
+      
+      .loading h1 {
+        margin: 0 0 20px 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00ff9d 0%, #00bfff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .loading p {
+        margin: 0;
+        opacity: 0.8;
+        font-weight: 400;
+      }
+      
+      .spinner {
+        border: 3px solid rgba(0, 255, 157, 0.1);
+        border-radius: 50%;
+        border-top: 3px solid #00ff9d;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+        box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-9a7cf039.js"></script>
+    <link rel="stylesheet" href="/assets/index-7494e004.css">
+  </head>
+  <body>
+    <div id="root">
+      <div class="loading">
+        <h1>PatriconID</h1>
+        <div class="spinner"></div>
+        <p>Loading P2P Identity Verification...</p>
+      </div>
+    </div>
+    
+    
+    <!-- Error handling for unsupported browsers -->
+    <script>
+      if (!window.WebAssembly) {
+        document.querySelector('.loading p').textContent = 'WebAssembly is required but not supported in this browser. Please use a modern browser.';
+      }
+      
+      if (!window.crypto || !window.crypto.subtle) {
+        document.querySelector('.loading p').textContent = 'Web Crypto API is required but not supported. Please use HTTPS and a modern browser.';
+      }
+      
+      // Add subtle animation to loading text
+      setTimeout(() => {
+        const loadingText = document.querySelector('.loading p');
+        if (loadingText && loadingText.textContent.includes('Loading')) {
+          let dots = '';
+          setInterval(() => {
+            dots = dots.length >= 3 ? '' : dots + '.';
+            loadingText.textContent = `Loading P2P Identity Verification${dots}`;
+          }, 500);
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>
