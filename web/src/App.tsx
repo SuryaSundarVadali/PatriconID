@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import P2PProofGenerator from './components/P2PProofGenerator'
 import P2PProofVerifier from './components/P2PProofVerifier'
+import Web3ProofDashboard from './components/Web3ProofDashboard'
 import { Shield, Users, Lock, Zap, Globe, ArrowRight, CheckCircle } from 'lucide-react'
 import './App.css'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'generate' | 'verify'>('generate')
+  const [activeTab, setActiveTab] = useState<'generate' | 'verify' | 'web3'>('web3')
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -115,13 +116,24 @@ function App() {
             <span>Verify Proof</span>
             <ArrowRight size={16} style={{ opacity: activeTab === 'verify' ? 1 : 0 }} />
           </button>
+          <button
+            className={`tab ${activeTab === 'web3' ? 'active web3-active' : ''}`}
+            onClick={() => setActiveTab('web3')}
+          >
+            <span>Web3 Dashboard</span>
+            <ArrowRight size={16} style={{ opacity: activeTab === 'web3' ? 1 : 0 }} />
+          </button>
         </div>
 
         <div className="tab-content">
           {activeTab === 'generate' ? (
             <P2PProofGenerator />
-          ) : (
+          ) : activeTab === 'verify' ? (
             <P2PProofVerifier />
+          ) : (
+            <div className="web3-dashboard-container">
+              <Web3ProofDashboard />
+            </div>
           )}
         </div>
       </main>
