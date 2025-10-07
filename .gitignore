@@ -1,0 +1,11 @@
+core/target/
+web/node_modules/
+web/dist/
+web/.env
+web/.env.local
+web/.env.development.local
+web/.env.test.local
+web/.env.production.local
+web/.next/
+web/out/
+web/.vercel/

@@ -41,14 +41,13 @@ body {
 
 /* Header */
 .app-header {
-  background: rgba(10, 10, 10, 0.95);
+  background: transparent;
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 255, 157, 0.2);
+  border-bottom: none;
   padding: 1rem 0;
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header-content {

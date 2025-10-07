@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use web_sys::console;
+use crate::aadhaar_xml_parser::{AadhaarXMLParser, VerifiedAadhaarData};
 
 // P2P Proof Service - Client-side ZK proof generation and verification
 // No backend required - everything runs locally
@@ -98,6 +99,9 @@ impl P2PProofService {
         // Simulate circuit execution (in real implementation, use Barretenberg)
         let proof_data = self.execute_circuit(&id_data, &challenge, proof_type).await?;
         
+        // Clone proof before moving
+        let proof_clone = proof_data.proof.clone();
+        
         // Create proof response
         let response = P2PProofResponse {
             proof: proof_data.proof,
@@ -107,7 +111,7 @@ impl P2PProofService {
                 "merkle_root_placeholder".to_string(),
                 commitment.clone(),
             ],
-            signature: self.sign_proof_with_passkey(&proof_data.proof).await?,
+            signature: self.sign_proof_with_passkey(&proof_clone).await?,
             nullifier_hash,
             commitment,
             timestamp: js_sys::Date::now() as u64,
@@ -251,6 +255,135 @@ impl P2PProofService {
 
     async fn send_direct(&self, proof: &str, recipient: &str) -> Result<String, JsValue> {
         Ok(format!("Sent to {} directly", recipient))
+    }
+
+    /// Verify Aadhaar XML with UIDAI digital signature
+    #[wasm_bindgen]
+    pub async fn verify_aadhaar_xml(
+        &self,
+        zip_file_data: &[u8],
+        share_code: &str,
+    ) -> Result<String, JsValue> {
+        console::log_1(&"Starting Aadhaar XML verification...".into());
+        
+        let parser = AadhaarXMLParser::new()
+            .map_err(|e| JsValue::from_str(&format!("Parser initialization failed: {}", e)))?;
+        
+        let verified_data = parser.parse_aadhaar_xml(zip_file_data, share_code)
+            .map_err(|e| JsValue::from_str(&format!("Aadhaar verification failed: {}", e)))?;
+        
+        if !verified_data.signature_valid {
+            return Err(JsValue::from_str("UIDAI signature verification failed"));
+        }
+        
+        console::log_1(&format!("✅ Aadhaar verified for: {}", verified_data.name).into());
+        
+        serde_json::to_string(&verified_data)
+            .map_err(|e| JsValue::from_str(&format!("Serialization error: {}", e)))
+    }
+
+    /// Generate ZK proof from verified Aadhaar data
+    #[wasm_bindgen]
+    pub async fn generate_aadhaar_proof(
+        &self,
+        verified_data_json: &str,
+        proof_type: u8, // 1=age, 2=residency, 3=composite
+        requirements_json: &str,
+    ) -> Result<String, JsValue> {
+        console::log_1(&"Generating ZK proof from Aadhaar data...".into());
+        
+        let aadhaar_data: VerifiedAadhaarData = serde_json::from_str(verified_data_json)
+            .map_err(|e| JsValue::from_str(&format!("Invalid Aadhaar data: {}", e)))?;
+        
+        let challenge: ProofChallenge = serde_json::from_str(requirements_json)
+            .map_err(|e| JsValue::from_str(&format!("Invalid requirements: {}", e)))?;
+        
+        // Convert Aadhaar data to circuit inputs
+        let birth_numeric = aadhaar_data.birth_date_numeric()
+            .map_err(|e| JsValue::from_str(&format!("Date parsing failed: {}", e)))?;
+        
+        let id_data = IDData {
+            birthdate: birth_numeric as u64,
+            nationality: 356, // India ISO 3166-1 numeric code
+            residency_code: aadhaar_data.address.state_code() as u64,
+            document_hash: self.hash_aadhaar_data(&aadhaar_data),
+            credit_score: 0, // Not applicable for Aadhaar
+        };
+        
+        // Generate proof using circuit
+        let id_data_json = serde_json::to_string(&id_data)
+            .map_err(|e| JsValue::from_str(&format!("Serialization error: {}", e)))?;
+        
+        let challenge_json = serde_json::to_string(&challenge)
+            .map_err(|e| JsValue::from_str(&format!("Serialization error: {}", e)))?;
+        
+        let proof_json = self.generate_proof(&id_data_json, &challenge_json, proof_type).await?;
+        
+        console::log_1(&"✅ ZK proof generated successfully".into());
+        
+        Ok(proof_json)
+    }
+
+    /// Validate Aadhaar number using Verhoeff algorithm
+    #[wasm_bindgen]
+    pub fn validate_aadhaar_number(&self, aadhaar: &str) -> bool {
+        crate::aadhaar_xml_parser::validate_aadhaar_number(aadhaar)
+    }
+
+    /// Calculate age from Aadhaar date of birth
+    #[wasm_bindgen]
+    pub fn calculate_age_from_dob(&self, dob_ddmmyyyy: &str, current_date_yyyymmdd: u32) -> Result<u32, JsValue> {
+        // Parse DD-MM-YYYY format
+        let parts: Vec<&str> = dob_ddmmyyyy.split('-').collect();
+        if parts.len() != 3 {
+            return Err(JsValue::from_str("Invalid date format. Expected DD-MM-YYYY"));
+        }
+        
+        let day: u32 = parts[0].parse()
+            .map_err(|_| JsValue::from_str("Invalid day"))?;
+        let month: u32 = parts[1].parse()
+            .map_err(|_| JsValue::from_str("Invalid month"))?;
+        let year: u32 = parts[2].parse()
+            .map_err(|_| JsValue::from_str("Invalid year"))?;
+        
+        let birth_numeric = year * 10000 + month * 100 + day;
+        
+        let birth_year = birth_numeric / 10000;
+        let birth_month = (birth_numeric / 100) % 100;
+        let birth_day = birth_numeric % 100;
+        
+        let current_year = current_date_yyyymmdd / 10000;
+        let current_month = (current_date_yyyymmdd / 100) % 100;
+        let current_day = current_date_yyyymmdd % 100;
+        
+        let mut age = current_year - birth_year;
+        
+        // Adjust if birthday hasn't occurred this year
+        if current_month < birth_month || (current_month == birth_month && current_day < birth_day) {
+            age -= 1;
+        }
+        
+        Ok(age)
+    }
+
+    // Private helper for hashing Aadhaar data
+    fn hash_aadhaar_data(&self, data: &VerifiedAadhaarData) -> String {
+        use sha2::{Sha256, Digest};
+        
+        let combined = format!(
+            "{}{}{}{}{}",
+            data.name,
+            data.date_of_birth,
+            data.gender,
+            data.address.full_address(),
+            data.reference_id
+        );
+        
+        let mut hasher = Sha256::new();
+        hasher.update(combined.as_bytes());
+        let result = hasher.finalize();
+        
+        format!("0x{}", hex::encode(result))
     }
 }
 

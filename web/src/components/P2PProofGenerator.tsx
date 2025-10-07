@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { Camera, Shield, Send, Check, AlertTriangle, Smartphone, Scan, Download } from 'lucide-react'
+import { Camera, Shield, Send, Check, AlertTriangle, Smartphone, Scan, Download, FileText } from 'lucide-react'
 import { P2PProofService } from '../lib/p2p-proof-service'
+import AadhaarXMLUpload from './AadhaarXMLUpload'
+import PageWrapper, { Card, Section, StatusBadge } from './PageWrapper'
 
 interface P2PProofGeneratorProps {
   onProofGenerated?: (proof: any) => void
@@ -252,10 +254,29 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
         </div>
         <div className="step-content">
           <div className="upload-methods">
+            {/* Aadhaar XML Upload - Recommended for India */}
+            <div className="upload-method-card highlighted">
+              <FileText className="upload-icon" />
+              <h4 className="upload-method-title">Aadhaar XML (India)</h4>
+              <p className="upload-method-description">
+                Upload offline e-KYC XML with UIDAI digital signature verification
+              </p>
+              <button 
+                className="upload-btn primary"
+                onClick={() => {
+                  const modal = document.getElementById('aadhaar-modal');
+                  if (modal) modal.style.display = 'block';
+                }}
+              >
+                <Shield size={16} />
+                Upload Aadhaar XML
+              </button>
+            </div>
+
             {/* NFC Scan */}
             <div className="upload-method-card" onClick={handleNFCScan}>
               <Smartphone className="upload-icon" />
-              <h4 className="upload-method-title">NFC Scan (Recommended)</h4>
+              <h4 className="upload-method-title">NFC Scan</h4>
               <p className="upload-method-description">
                 Tap your NFC-enabled passport or ID card for secure data extraction
               </p>
@@ -290,6 +311,32 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
             </div>
           </div>
         </div>
+      
+      {/* Aadhaar XML Upload Modal */}
+      <div id="aadhaar-modal" className="modal" style={{ display: 'none' }}>
+        <div className="modal-content">
+          <span 
+            className="modal-close"
+            onClick={() => {
+              const modal = document.getElementById('aadhaar-modal');
+              if (modal) modal.style.display = 'none';
+            }}
+          >
+            &times;
+          </span>
+          <AadhaarXMLUpload
+            onVerified={(data) => {
+              console.log('Aadhaar verified:', data);
+              setSelectedFile(new File([], 'aadhaar-verified.xml'));
+              const modal = document.getElementById('aadhaar-modal');
+              if (modal) modal.style.display = 'none';
+            }}
+            onError={(error) => {
+              console.error('Aadhaar verification error:', error);
+            }}
+          />
+        </div>
+      </div>
       </div>
 
       {/* Proof Type Selection */}

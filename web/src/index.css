@@ -1,9 +1,15 @@
+/* Tailwind CSS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Global styles */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -42,4 +48,48 @@ button {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Celestia-style animations */
+@keyframes gradient-move {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(40px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes gradient-move2 {
+  0% { transform: translateX(0) scale(1); }
+  50% { transform: translateX(-40px) scale(1.05); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+.animate-gradient-move {
+  animation: gradient-move 8s ease-in-out infinite;
+}
+
+.animate-gradient-move2 {
+  animation: gradient-move2 10s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 1.2s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+
+/* Celestia gradient background */
+.bg-celestia-gradient {
+  background: linear-gradient(135deg, #A06CF2, #E68CFF, #A6F5E9, #FFF7D1);
+  background-size: 200% 200%;
+}
+
+/* Inter font utility */
+.font-inter {
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
 }
