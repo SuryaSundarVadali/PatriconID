@@ -4,36 +4,29 @@ import { Shield, Lock, Zap, CheckCircle } from "lucide-react";
 export default function CelestiaHero() {
   return (
     <div className="w-full relative overflow-hidden">
-      {/* Animated gradient background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-60">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-gradient-to-br from-purple-400/40 to-purple-600/40 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute top-20 -right-40 w-[500px] h-[500px] bg-gradient-to-br from-pink-400/40 to-rose-500/40 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute -bottom-40 left-1/3 w-[450px] h-[450px] bg-gradient-to-br from-orange-300/40 to-amber-400/40 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
-      </div>
-
       {/* Hero Section */}
       <div className="relative flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32 max-w-7xl mx-auto">
         {/* Badge */}
         <div className="inline-block mb-8 animate-slide-up">
-          <div className="px-6 py-3 bg-gradient-to-r from-white/90 to-white/80 backdrop-blur-xl text-purple-700 rounded-full text-sm sm:text-base font-semibold shadow-smooth border border-purple-200/50 hover:scale-105 transition-transform duration-300">
+          <div className="glass-card px-6 py-3 text-indigo-400 rounded-full text-sm sm:text-base font-semibold hover:scale-105 transition-transform duration-300">
             <span className="inline-flex items-center gap-2">
-              <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+              <span className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
               Privacy-First Identity Verification
             </span>
           </div>
         </div>
         
         {/* Main Headline */}
-        <h1 className="font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[1.1] mb-6 sm:mb-8 animate-slide-up tracking-tight" style={{ animationDelay: '0.1s' }}>
-          <span className="block mb-2 sm:mb-3">The first modular</span>
-          <span className="block bg-clip-text text-transparent bg-gradient-to-r from-black via-black to-black font-extrabold">
-            blockchain network
+        <h1 className="font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[1.1] mb-6 sm:mb-8 animate-slide-up tracking-tight text-white" style={{ animationDelay: '0.1s' }}>
+          <span className="block mb-2 sm:mb-3">P2P Identity Proof</span>
+          <span className="block bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 font-extrabold">
+            Generator
           </span>
         </h1>
         
         {/* Subheadline */}
-        <p className="font-normal text-base sm:text-lg md:text-xl lg:text-2xl text-black/70 max-w-4xl mx-auto mb-12 sm:mb-16 animate-slide-up leading-relaxed px-4" style={{ animationDelay: '0.2s' }}>
-          PatriconID is a privacy-first decentralized identity verification platform that makes it easy for anyone to securely prove their identity without revealing personal data.
+        <p className="font-normal text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 max-w-4xl mx-auto mb-12 sm:mb-16 animate-slide-up leading-relaxed px-4" style={{ animationDelay: '0.2s' }}>
+          Generate zero-knowledge proofs locally with mathematical privacy guarantees. Your data never leaves your device.
         </p>
         
         {/* CTA Buttons */}

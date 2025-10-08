@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { Camera, Shield, Send, Check, AlertTriangle, Smartphone, Scan, Download, FileText } from 'lucide-react'
+import { Camera, Shield, Send, Check, AlertTriangle, Smartphone, Scan, Download, FileText, Upload, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
 import { P2PProofService } from '../lib/p2p-proof-service'
 import AadhaarXMLUpload from './AadhaarXMLUpload'
-import PageWrapper, { Card, Section, StatusBadge } from './PageWrapper'
 
 interface P2PProofGeneratorProps {
   onProofGenerated?: (proof: any) => void
@@ -18,14 +17,15 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
   const [generatedProof, setGeneratedProof] = useState<any>(null)
   const [passkeyBound, setPasskeyBound] = useState(false)
   const [showQR, setShowQR] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
 
   // Proof type options for selective disclosure
   const proofTypes = [
-    { id: 1, name: 'Age Verification', description: 'Prove age above 18 without revealing birthdate' },
-    { id: 2, name: 'Residency Proof', description: 'Prove residency without revealing address' },
-    { id: 3, name: 'Nationality Proof', description: 'Prove nationality without revealing country' },
-    { id: 4, name: 'Credit Score', description: 'Prove creditworthiness without revealing score' },
-    { id: 5, name: 'Composite Proof', description: 'Multiple attributes in one proof' },
+    { id: 1, name: 'Age Verification', description: 'Prove age above 18 without revealing birthdate', icon: Shield },
+    { id: 2, name: 'Residency Proof', description: 'Prove residency without revealing address', icon: FileText },
+    { id: 3, name: 'Nationality Proof', description: 'Prove nationality without revealing country', icon: Shield },
+    { id: 4, name: 'Credit Score', description: 'Prove creditworthiness without revealing score', icon: CheckCircle },
+    { id: 5, name: 'Composite Proof', description: 'Multiple attributes in one proof', icon: Shield },
   ]
 
   useEffect(() => {
@@ -48,36 +48,34 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
     }
   }
 
-  const handleNFCScan = async () => {
-    // NFC scanning implementation
-    try {
-      // @ts-ignore - NFC API
-      if ('NDEFReader' in window) {
-        // @ts-ignore
-        const ndef = new NDEFReader()
-        await ndef.scan()
-        console.log('NFC scan initiated')
-      } else {
-        alert('NFC not supported on this device')
-      }
-    } catch (error) {
-      console.error('NFC scan failed:', error)
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(false)
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      setSelectedFile(files[0])
     }
   }
 
   const bindPasskey = async () => {
     try {
-      // WebAuthn/Passkey registration
       const credential = await navigator.credentials.create({
         publicKey: {
           challenge: crypto.getRandomValues(new Uint8Array(32)),
-          rp: {
-            name: "PatriconID",
-            id: window.location.hostname,
-          },
+          rp: { name: "PatriconID" },
           user: {
             id: crypto.getRandomValues(new Uint8Array(32)),
-            name: "user@patriconidd.com",
+            name: "user@patricon.id",
             displayName: "PatriconID User",
           },
           pubKeyCredParams: [{ alg: -7, type: "public-key" }],
@@ -134,29 +132,8 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
 
     } catch (error) {
       console.error('Proof generation failed:', error)
-      alert('Proof generation failed. Please try again.')
     } finally {
       setIsGenerating(false)
-    }
-  }
-
-  const sendProofP2P = async (channel: string) => {
-    if (!generatedProof) return
-
-    try {
-      const result = await proofService.send_proof_p2p(
-        JSON.stringify(generatedProof),
-        channel,
-        "verifier@example.com"
-      )
-
-      if (channel === 'qr') {
-        setShowQR(true)
-      } else {
-        console.log('Proof sent via', channel, result)
-      }
-    } catch (error) {
-      console.error('Failed to send proof:', error)
     }
   }
 
@@ -164,19 +141,16 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
     if (!generatedProof) return
 
     try {
-      // Create a formatted JSON string for the proof
       const proofData = {
         ...generatedProof,
         metadata: {
           proof_type: proofTypes.find(t => t.id === proofType)?.name || 'Unknown',
           generated_at: new Date(generatedProof.timestamp).toISOString(),
           version: '1.0.0',
-          format: 'PatriconID P2P Proof'
         }
       }
 
-      const jsonString = JSON.stringify(proofData, null, 2)
-      const blob = new Blob([jsonString], { type: 'application/json' })
+      const blob = new Blob([JSON.stringify(proofData, null, 2)], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       
       // Create descriptive filename
@@ -203,312 +177,271 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
     }
   }
 
+  const handleNFCScan = async () => {
+    // NFC scanning implementation
+    try {
+      // @ts-ignore - NFC API
+      if ('NDEFReader' in window) {
+        // @ts-ignore
+        const ndef = new NDEFReader()
+        await ndef.scan()
+        console.log('NFC scan initiated')
+      } else {
+        alert('NFC not supported on this device')
+      }
+    } catch (error) {
+      console.error('NFC scan failed:', error)
+    }
+  }
+
   return (
-    <div className="proof-generator-container animate-fade-in">
-      <div className="proof-section-header animate-slide-up">
-        <div className="section-title-wrapper">
-          <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl backdrop-blur-sm border border-purple-200/30 animate-pulse-glow">
-            <Shield className="section-icon text-purple-600" size={24} />
-          </div>
-          <h2 className="section-title">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              P2P Identity Proof Generator
-            </span>
-          </h2>
-        </div>
-        <p className="section-description animate-slide-up delay-100">
-          Generate zero-knowledge proofs locally with mathematical privacy guarantees
+    <div className="container mx-auto px-6 pt-8 pb-12">
+      <div className="max-w-3xl mx-auto text-center mb-8">
+        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight">
+          P2P Identity Proof Generator
+        </h1>
+        <p className="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+          Generate zero-knowledge proofs locally with mathematical privacy guarantees. Your data never leaves your device.
         </p>
       </div>
 
-      {/* Service Status */}
-      <div className="status-card group hover:shadow-2xl transition-all duration-500 animate-slide-up delay-200">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
-        <h3 className="status-title relative z-10">
-          <Send size={20} className="text-purple-600" />
-          Service Status
-        </h3>
-        <div className="status-indicators relative z-10">
-          <div className="status-item group/item hover:scale-105 transition-transform duration-300">
-            <div className={`status-dot ${isInitialized ? 'status-active animate-pulse' : 'status-pending animate-pulse-glow'}`} />
-            <span className="status-label">
-              P2P Service: <span className={isInitialized ? 'text-green-600 font-semibold' : 'text-orange-500'}>{isInitialized ? 'Ready ✓' : 'Initializing...'}</span>
-            </span>
+      <div className="max-w-3xl mx-auto space-y-8">
+        {/* Service Status Card */}
+        <div className="glass-card rounded-2xl p-6 md:p-8">
+          <div className="flex items-center space-x-3 mb-6">
+            <Shield className="w-6 h-6 text-gray-300" />
+            <h2 className="text-xl font-semibold text-white">Service Status</h2>
           </div>
-          <div className="status-item group/item hover:scale-105 transition-transform duration-300">
-            <div className={`status-dot ${passkeyBound ? 'status-active animate-pulse' : 'status-inactive'}`} />
-            <span className="status-label">
-              Passkey Binding: <span className={passkeyBound ? 'text-green-600 font-semibold' : 'text-gray-500'}>{passkeyBound ? 'Bound ✓' : 'Not Bound'}</span>
-            </span>
-            {!passkeyBound && (
-              <button
-                onClick={bindPasskey}
-                className="bind-passkey-btn group/btn hover:scale-110 hover:shadow-xl transition-all duration-300"
-              >
-                <Send size={16} className="group-hover/btn:rotate-12 transition-transform duration-300" />
-                Bind Passkey
-              </button>
+          <div className="space-y-4 text-sm md:text-base">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-gray-300">
+                <span className="font-medium">P2P Service:</span>
+                <span>{isInitialized ? 'Ready' : 'Initializing...'}</span>
+              </div>
+              {isInitialized ? (
+                <CheckCircle className="w-5 h-5 text-green-400" />
+              ) : (
+                <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-gray-300">
+                <span className="font-medium">Passkey Binding:</span>
+                <span className={passkeyBound ? "text-green-400" : "text-yellow-400"}>
+                  {passkeyBound ? 'Bound' : 'Not Bound'}
+                </span>
+              </div>
+              {!passkeyBound && (
+                <button 
+                  onClick={bindPasskey}
+                  className="btn-primary text-xs md:text-sm font-semibold text-white px-4 py-2 rounded-lg"
+                >
+                  Bind Passkey
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Upload ID Document Card */}
+        <div className="glass-card rounded-2xl p-6 md:p-8">
+          <div className="flex items-center space-x-3 mb-6">
+            <Upload className="w-6 h-6 text-gray-300" />
+            <h2 className="text-xl font-semibold text-white">Scan or Upload ID Document</h2>
+          </div>
+
+          <div 
+            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
+              dragOver 
+                ? 'upload-zone drag-over' 
+                : selectedFile 
+                  ? 'border-green-500 bg-green-500/10' 
+                  : 'upload-zone'
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => document.getElementById('file-input')?.click()}
+          >
+            <input 
+              type="file" 
+              id="file-input" 
+              className="hidden"
+              accept=".xml,.pdf,.jpg,.png"
+              onChange={handleFileUpload}
+            />
+            {selectedFile ? (
+              <div className="space-y-2">
+                <CheckCircle className="mx-auto h-12 w-12 text-green-400" />
+                <p className="text-green-400 font-semibold">
+                  Selected: {selectedFile.name}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {(selectedFile.size / 1024).toFixed(2)} KB
+                </p>
+              </div>
+            ) : (
+              <>
+                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="mt-2 text-sm text-gray-400">
+                  <span className="font-semibold text-indigo-400">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-500">XML, PDF, or image files</p>
+              </>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Document Upload/Scan */}
-      <div className="proof-step-card animate-slide-up delay-300">
-        <div className="step-header">
-          <div className="step-number bg-gradient-to-br from-purple-500 to-purple-600 shadow-xl animate-pulse-glow">1</div>
-          <h3 className="step-title">Scan or Upload ID Document</h3>
-        </div>
-        <div className="step-content">
-          <div className="upload-methods">
-            {/* Aadhaar XML Upload - Recommended for India */}
-            <div className="upload-method-card highlighted group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in" style={{ animationDelay: '0.4s' }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
-              <FileText className="upload-icon text-purple-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 relative z-10" />
-              <h4 className="upload-method-title relative z-10">Aadhaar XML (India)</h4>
-              <p className="upload-method-description relative z-10">
-                Upload offline e-KYC XML with UIDAI digital signature verification
-              </p>
-              <button 
-                className="upload-btn primary group/btn hover:scale-110 hover:shadow-xl transition-all duration-300 relative z-10"
-                onClick={() => {
-                  const modal = document.getElementById('aadhaar-modal');
-                  if (modal) modal.style.display = 'block';
-                }}
-              >
-                <Shield size={16} className="group-hover/btn:rotate-12 transition-transform duration-300" />
-                Upload Aadhaar XML
+          <div className="mt-6">
+            <p className="text-sm font-medium text-gray-400 mb-3">Or select a document type:</p>
+            <div className="flex flex-wrap gap-3">
+              <button className="btn-secondary text-sm font-medium px-4 py-2 rounded-lg flex items-center space-x-2">
+                <FileText className="w-4 h-4" />
+                <span>Aadhaar XML (India)</span>
               </button>
-            </div>
-
-            {/* NFC Scan */}
-            <div className="upload-method-card group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in" style={{ animationDelay: '0.5s' }} onClick={handleNFCScan}>
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
-              <Smartphone className="upload-icon text-cyan-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 relative z-10" />
-              <h4 className="upload-method-title relative z-10">NFC Scan</h4>
-              <p className="upload-method-description relative z-10">
-                Tap your NFC-enabled passport or ID card for secure data extraction
-              </p>
-              <button className="upload-btn group/btn hover:scale-110 hover:shadow-xl transition-all duration-300 relative z-10">
-                <Scan size={16} className="group-hover/btn:scale-125 transition-transform duration-300" />
-                Start NFC Scan
+              <button className="btn-secondary text-sm font-medium px-4 py-2 rounded-lg flex items-center space-x-2 opacity-50 cursor-not-allowed">
+                <Shield className="w-4 h-4" />
+                <span>Passport (Coming Soon)</span>
               </button>
-            </div>
-
-            {/* File Upload */}
-            <div className="upload-method-card group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in" style={{ animationDelay: '0.6s' }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
-              <Camera className="upload-icon text-orange-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 relative z-10" />
-              <h4 className="upload-method-title relative z-10">Upload Photo</h4>
-              <p className="upload-method-description relative z-10">
-                Upload a clear photo of your document for OCR processing
-              </p>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-                id="document-upload"
-                style={{ display: 'none' }}
-              />
-              <label htmlFor="document-upload" className="upload-btn secondary group/btn hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer relative z-10">
-                <Camera size={16} className="group-hover/btn:scale-125 transition-transform duration-300" />
-                Choose File
-              </label>
-              {selectedFile && (
-                <div className="file-selected animate-slide-in-left relative z-10">✓ {selectedFile.name}</div>
-              )}
             </div>
           </div>
         </div>
-      
-      {/* Aadhaar XML Upload Modal */}
-      <div id="aadhaar-modal" className="modal" style={{ display: 'none' }}>
-        <div className="modal-content">
-          <span 
-            className="modal-close"
-            onClick={() => {
-              const modal = document.getElementById('aadhaar-modal');
-              if (modal) modal.style.display = 'none';
-            }}
-          >
-            &times;
-          </span>
-          <AadhaarXMLUpload
-            onVerified={(data) => {
-              console.log('Aadhaar verified:', data);
-              setSelectedFile(new File([], 'aadhaar-verified.xml'));
-              const modal = document.getElementById('aadhaar-modal');
-              if (modal) modal.style.display = 'none';
-            }}
-            onError={(error) => {
-              console.error('Aadhaar verification error:', error);
-            }}
-          />
-        </div>
-      </div>
-      </div>
 
-      {/* Proof Type Selection */}
-      <div className="proof-step-card animate-slide-up delay-300">
-        <div className="step-header">
-          <div className="step-number bg-gradient-to-br from-pink-500 to-rose-600 shadow-xl animate-pulse-glow">2</div>
-          <h3 className="step-title">Select Proof Type</h3>
-        </div>
-        <div className="step-content">
-          <div className="proof-types-grid">
-            {proofTypes.map((type, index) => (
-              <div
-                key={type.id}
-                className={`proof-type-card group hover:scale-105 transition-all duration-500 animate-scale-in ${proofType === type.id ? 'selected ring-4 ring-purple-400/50 shadow-2xl' : ''}`}
-                onClick={() => setProofType(type.id)}
-                style={{ animationDelay: `${0.7 + index * 0.1}s` }}
-              >
-                <div className={`absolute inset-0 ${proofType === type.id ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20' : 'bg-gradient-to-br from-gray-500/5 to-transparent group-hover:from-purple-500/10 group-hover:to-pink-500/10'} transition-all duration-500 rounded-2xl`}></div>
-                <h4 className="proof-type-name relative z-10">{type.name}</h4>
-                <p className="proof-type-description relative z-10">{type.description}</p>
-                {proofType === type.id && (
-                  <div className="absolute top-4 right-4 z-20">
-                    <Check className="w-6 h-6 text-purple-600 animate-scale-in" />
+        {/* Proof Type Selection */}
+        <div className="glass-card rounded-2xl p-6 md:p-8">
+          <div className="flex items-center space-x-3 mb-6">
+            <Shield className="w-6 h-6 text-gray-300" />
+            <h2 className="text-xl font-semibold text-white">Select Proof Type</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {proofTypes.map((type) => {
+              const IconComponent = type.icon;
+              return (
+                <div
+                  key={type.id}
+                  className={`glass-card p-4 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white/10 ${
+                    proofType === type.id 
+                      ? 'ring-2 ring-indigo-400 bg-indigo-500/20' 
+                      : ''
+                  }`}
+                  onClick={() => setProofType(type.id)}
+                >
+                  <div className="flex items-start space-x-3">
+                    <IconComponent className="w-5 h-5 text-indigo-400 mt-1 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h3 className="font-medium text-white mb-1">{type.name}</h3>
+                      <p className="text-sm text-gray-400">{type.description}</p>
+                    </div>
+                    {proofType === type.id && (
+                      <CheckCircle className="w-5 h-5 text-indigo-400 flex-shrink-0" />
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
 
-      {/* Generate Proof */}
-      <div className="proof-step-card animate-slide-up delay-300">
-        <div className="step-header">
-          <div className="step-number bg-gradient-to-br from-cyan-500 to-blue-600 shadow-xl animate-pulse-glow">3</div>
-          <h3 className="step-title">Generate ZK Proof</h3>
+        {/* Generate Proof Button */}
+        <div className="text-center">
+          <button
+            onClick={generateProof}
+            disabled={!selectedFile || !isInitialized || isGenerating}
+            className={`w-full md:w-auto btn-primary text-base font-semibold text-white px-8 py-3 rounded-lg flex items-center justify-center mx-auto space-x-2 transition-all duration-300 ${
+              (!selectedFile || !isInitialized || isGenerating) 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:shadow-[0_0_20px_rgba(79,70,229,0.6)]'
+            }`}
+          >
+            {isGenerating ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Generating Proof...</span>
+              </>
+            ) : (
+              <>
+                <Shield className="w-5 h-5" />
+                <span>Generate ZK Proof</span>
+              </>
+            )}
+          </button>
         </div>
-        <div className="step-content">
-          <div className="action-buttons">
-            <button
-              onClick={generateProof}
-              disabled={!selectedFile || !isInitialized || isGenerating}
-              className={`primary-btn group/btn hover:scale-110 hover:shadow-2xl transition-all duration-300 ${(!selectedFile || !isInitialized || isGenerating) ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              {isGenerating ? (
-                <>
-                  <div className="loading-spinner-inline animate-spin"></div>
-                  <span className="animate-pulse">Generating Proof...</span>
-                </>
-              ) : (
-                <>
-                  <Shield size={20} className="group-hover/btn:rotate-12 transition-transform duration-300" />
-                  <span>Generate ZK Proof</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
 
-      {/* Proof Result & P2P Sharing */}
-      {generatedProof && (
-        <div className="proof-step-card animate-scale-in bg-gradient-to-br from-green-50/50 to-emerald-50/50 border-green-200/50">
-          <div className="step-header">
-            <div className="step-number bg-gradient-to-br from-green-500 to-emerald-600 shadow-xl animate-pulse">4</div>
-            <h3 className="step-title flex items-center gap-2">
-              Share Proof (P2P)
-              <Check className="w-6 h-6 text-green-600 animate-bounce" />
-            </h3>
-          </div>
-          <div className="step-content">
-            {/* Proof Details */}
-            <div className="status-card bg-white/80 backdrop-blur-xl border-green-200/50 animate-slide-up">
-              <div className="status-indicators">
-                <div className="status-item">
-                  <Check className="status-dot status-active animate-pulse" size={16} />
-                  <span className="status-label text-green-700 font-semibold">Proof Generated Successfully ✓</span>
-                </div>
+        {/* Proof Result */}
+        {generatedProof && (
+          <div className="glass-card-elevated rounded-2xl p-6 md:p-8 border-green-500/50">
+            <div className="flex items-center space-x-3 mb-6">
+              <CheckCircle className="w-6 h-6 text-green-400" />
+              <h2 className="text-xl font-semibold text-white">Proof Generated Successfully!</h2>
+            </div>
+            
+            <div className="space-y-4 mb-6">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Proof Type:</span>
+                <span className="text-white font-medium">
+                  {proofTypes.find(t => t.id === proofType)?.name}
+                </span>
               </div>
-              <div className="proof-details">
-                <div className="proof-detail-item animate-slide-in-left" style={{ animationDelay: '0.1s' }}>
-                  <strong>Proof Type:</strong> {proofTypes.find(t => t.id === proofType)?.name}
-                </div>
-                <div className="proof-detail-item animate-slide-in-left" style={{ animationDelay: '0.2s' }}>
-                  <strong>Generated:</strong> {new Date(generatedProof.timestamp).toLocaleString()}
-                </div>
-                <div className="proof-detail-item animate-slide-in-left" style={{ animationDelay: '0.3s' }}>
-                  <strong>Nullifier:</strong> {generatedProof.nullifier_hash.substring(0, 16)}...
-                </div>
-                <div className="proof-detail-item animate-slide-in-left" style={{ animationDelay: '0.4s' }}>
-                  <strong>Passkey Signed:</strong> ✅
-                </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Generated:</span>
+                <span className="text-white font-medium">
+                  {new Date(generatedProof.timestamp).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Nullifier:</span>
+                <span className="text-white font-mono text-xs">
+                  {generatedProof.nullifier_hash.substring(0, 16)}...
+                </span>
               </div>
             </div>
 
-            {/* P2P Sharing Options */}
-            <div className="sharing-methods">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={downloadProof}
-                className="secondary-btn group/btn hover:scale-110 hover:shadow-2xl transition-all duration-300 animate-scale-in"
-                style={{ animationDelay: '0.5s' }}
+                className="btn-secondary text-sm font-medium text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 flex-1"
               >
-                <Download size={20} className="group-hover/btn:scale-125 group-hover/btn:-translate-y-1 transition-all duration-300" />
+                <Download className="w-4 h-4" />
                 <span>Download Proof</span>
               </button>
-              
               <button
-                onClick={() => sendProofP2P('qr')}
-                className="secondary-btn group/btn hover:scale-110 hover:shadow-2xl transition-all duration-300 animate-scale-in"
-                style={{ animationDelay: '0.6s' }}
+                onClick={() => setShowQR(!showQR)}
+                className="btn-secondary text-sm font-medium text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 flex-1"
               >
-                <Smartphone size={20} className="group-hover/btn:scale-125 group-hover/btn:rotate-6 transition-all duration-300" />
-                <span>Share via QR Code</span>
-              </button>
-              
-              <button
-                onClick={() => sendProofP2P('walletconnect')}
-                className="secondary-btn"
-              >
-                <Send size={20} />
-                <span>WalletConnect</span>
-              </button>
-              
-              <button
-                onClick={() => sendProofP2P('direct')}
-                className="secondary-btn"
-              >
-                <Send size={20} />
-                <span>Direct P2P</span>
+                <Scan className="w-4 h-4" />
+                <span>Show QR Code</span>
               </button>
             </div>
 
-            {/* QR Code Display */}
             {showQR && (
-              <div className="qr-display">
-                <h4 className="qr-title">Scan to Verify Proof</h4>
-                <div className="qr-code-wrapper">
+              <div className="mt-6 text-center glass-card p-6 rounded-xl">
+                <div className="inline-block p-4 bg-white rounded-xl">
                   <QRCodeSVG
-                    value={`patricon://verify?proof=${btoa(JSON.stringify(generatedProof))}`}
+                    value={JSON.stringify(generatedProof)}
                     size={200}
+                    level="H"
                   />
                 </div>
-                <p className="qr-description">
-                  Verifier can scan this QR code to verify your proof locally
+                <p className="mt-4 text-sm text-gray-400">
+                  Scan with any QR code reader or PatriconID app
                 </p>
               </div>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Privacy Notice */}
-      <div className="privacy-notice">
-        <div className="privacy-icon">
-          <Shield size={24} />
-        </div>
-        <div className="privacy-content">
-          <h4 className="privacy-title">Mathematical Privacy Guarantee</h4>
-          <p className="privacy-description">
-            Your personal data never leaves your device. Only the requested attributes are proven mathematically, 
-            and proofs are cryptographically bound to your biometric/passkey to prevent unauthorized transfer.
-          </p>
+        {/* Privacy Notice */}
+        <div className="glass-card rounded-2xl p-6 md:p-8 border-purple-500/30">
+          <div className="flex items-start space-x-3">
+            <Shield className="w-6 h-6 text-purple-400 mt-1 flex-shrink-0" />
+            <div>
+              <h3 className="font-semibold text-white mb-2">Mathematical Privacy Guarantee</h3>
+              <p className="text-sm text-gray-400">
+                🔒 Your personal data never leaves your device. Only the requested attributes are proven mathematically, 
+                and proofs are cryptographically bound to your biometric/passkey to prevent unauthorized transfer.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

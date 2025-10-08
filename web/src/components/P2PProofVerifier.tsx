@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Shield, Check, X, AlertTriangle, QrCode, Upload, Scan, Eye, Clock } from 'lucide-react'
+import { Shield, Check, X, AlertTriangle, QrCode, Upload, Scan, Eye, Clock, CheckCircle, XCircle } from 'lucide-react'
 import { P2PProofService, P2PProofResponse } from '../lib/p2p-proof-service'
 
 const P2PProofVerifier: React.FC = () => {
@@ -207,260 +207,256 @@ const P2PProofVerifier: React.FC = () => {
   }
 
   return (
-    <div className="proof-verifier-container animate-fade-in">
-      <div className="proof-section-header animate-slide-up">
-        <div className="section-title-wrapper">
-          <div className="p-3 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border border-cyan-200/30 animate-pulse-glow">
-            <Eye className="section-icon text-cyan-600" size={24} />
-          </div>
-          <h2 className="section-title">
-            <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
-              P2P Proof Verifier
-            </span>
-          </h2>
-        </div>
-        <p className="section-description animate-slide-up delay-100">
-          Verify zero-knowledge proofs locally with cryptographic guarantees
+    <div className="container mx-auto px-6 pt-8 pb-12">
+      <div className="max-w-3xl mx-auto text-center mb-8">
+        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight">
+          P2P Identity Proof Verifier
+        </h1>
+        <p className="mt-4 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+          Verify zero-knowledge proofs locally with cryptographic guarantees. No data leaves your device.
         </p>
       </div>
 
-      {/* Service Status */}
-      <div className="status-card group hover:shadow-2xl transition-all duration-500 animate-slide-up delay-200">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
-        <h3 className="status-title relative z-10">
-          <Shield size={20} className="text-cyan-600" />
-          Verification Status
-        </h3>
-        <div className="status-indicators relative z-10">
-          <div className="status-item hover:scale-105 transition-transform duration-300">
-            <div className={`status-dot ${isInitialized ? 'status-active animate-pulse' : 'status-pending animate-pulse-glow'}`} />
-            <span className="status-label">
-              P2P Verifier: <span className={isInitialized ? 'text-green-600 font-semibold' : 'text-orange-500'}>{isInitialized ? 'Ready ✓' : 'Initializing...'}</span>
-            </span>
+      <div className="max-w-3xl mx-auto space-y-8">
+        {/* Service Status Card */}
+        <div className="glass-card rounded-2xl p-6 md:p-8">
+          <div className="flex items-center space-x-3 mb-6">
+            <Shield className="w-6 h-6 text-gray-300" />
+            <h2 className="text-xl font-semibold text-white">Verification Status</h2>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 text-gray-300">
+              <span className="font-medium">P2P Verifier:</span>
+              <span>{isInitialized ? 'Ready' : 'Initializing...'}</span>
+            </div>
+            {isInitialized ? (
+              <CheckCircle className="w-5 h-5 text-green-400" />
+            ) : (
+              <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Proof Input Methods */}
-      <div className="proof-step-card animate-slide-up delay-300">
-        <div className="step-header">
-          <div className="step-number bg-gradient-to-br from-cyan-500 to-blue-600 shadow-xl animate-pulse-glow">1</div>
-          <div className="step-content">
-            <h3 className="step-title">Input Proof for Verification</h3>
-            <p className="step-description">Provide the zero-knowledge proof to verify</p>
+        {/* Input Proof Methods */}
+        <div className="glass-card rounded-2xl p-6 md:p-8">
+          <div className="flex items-center space-x-3 mb-6">
+            <Upload className="w-6 h-6 text-gray-300" />
+            <h2 className="text-xl font-semibold text-white">Input Proof for Verification</h2>
           </div>
-        </div>
-        
-        {/* Input Method Buttons */}
-        <div className="upload-methods">
-          <button
-            onClick={openQRScanner}
-            disabled={qrScannerOpen}
-            className="upload-method-btn group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in"
-            style={{ animationDelay: '0.4s' }}
-          >
-            <Scan className="upload-icon text-cyan-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
-            <span>{qrScannerOpen ? '🔄 Scanning...' : 'Scan QR Code'}</span>
-          </button>
 
-          <div 
-            className={`upload-method-btn upload-file-btn group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in ${isDragOver ? 'drag-over ring-4 ring-cyan-400/50 scale-105' : ''} ${uploadStatus}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            style={{ animationDelay: '0.5s' }}
-          >
-            <div className={`absolute inset-0 ${isDragOver ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20' : 'bg-gradient-to-br from-cyan-500/0 to-blue-500/0 group-hover:from-cyan-500/10 group-hover:to-blue-500/10'} transition-all duration-500 rounded-2xl`}></div>
-            <Upload className={`upload-icon relative z-10 ${uploadStatus === 'success' ? 'text-green-600' : uploadStatus === 'error' ? 'text-red-600' : 'text-blue-600'} group-hover:scale-110 transition-all duration-300`} />
-            <span className="relative z-10">
-              {uploadStatus === 'uploading' ? '⏳ Uploading...' :
-               uploadStatus === 'success' ? `✓ ${uploadedFileName}` :
-               uploadStatus === 'error' ? '❌ Upload Failed' :
-               isDragOver ? '📥 Drop file here' : 'Upload Proof File'}
-            </span>
-            <input
-              type="file"
-              accept=".json,.txt,application/json"
-              onChange={uploadProofFile}
-              className="file-input"
+          {/* Input Method Buttons */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <button
+              onClick={openQRScanner}
+              disabled={qrScannerOpen}
+              className={`btn-secondary p-4 rounded-xl flex items-center justify-center space-x-2 transition-all duration-300 ${
+                qrScannerOpen ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/20'
+              }`}
+            >
+              <QrCode className="w-5 h-5" />
+              <span>{qrScannerOpen ? 'Scanning...' : 'Scan QR Code'}</span>
+            </button>
+
+            <div 
+              className={`btn-secondary p-4 rounded-xl flex items-center justify-center space-x-2 cursor-pointer transition-all duration-300 relative ${
+                isDragOver 
+                  ? 'upload-zone drag-over' 
+                  : uploadStatus === 'success'
+                    ? 'border-green-500 bg-green-500/10'
+                    : uploadStatus === 'error'
+                      ? 'border-red-500 bg-red-500/10'
+                      : 'hover:bg-white/20'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <Upload className={`w-5 h-5 ${
+                uploadStatus === 'success' ? 'text-green-400' : 
+                uploadStatus === 'error' ? 'text-red-400' : 
+                'text-gray-300'
+              }`} />
+              <span className="text-white">
+                {uploadStatus === 'uploading' ? 'Uploading...' :
+                 uploadStatus === 'success' ? `✓ ${uploadedFileName}` :
+                 uploadStatus === 'error' ? '❌ Upload Failed' :
+                 isDragOver ? 'Drop file here' : 'Upload Proof File'}
+              </span>
+              <input
+                type="file"
+                accept=".json,.txt,application/json"
+                onChange={uploadProofFile}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* Upload Error */}
+          {uploadError && (
+            <div className="flex items-center space-x-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg mb-4 text-red-400">
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              <span className="text-sm">{uploadError}</span>
+            </div>
+          )}
+
+          {/* Text Input */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-400">
+              Proof Data (JSON or patricon:// URL)
+            </label>
+            <textarea
+              value={proofInput}
+              onChange={handleProofInput}
+              placeholder="Paste proof JSON data or scan QR code..."
+              className="w-full h-32 p-4 glass-card rounded-xl text-white placeholder-gray-500 border-0 focus:ring-2 focus:ring-indigo-400 transition-all duration-300 resize-none"
             />
           </div>
 
-          {/* Upload Status Messages */}
-          {uploadError && (
-            <div className="upload-error-message animate-slide-in-left">
-              <AlertTriangle size={16} />
-              <span>{uploadError}</span>
-            </div>
-          )}
-
-          <div className="upload-method-btn upload-placeholder animate-scale-in" style={{ animationDelay: '0.6s' }}>
-            <span>Or paste below</span>
-          </div>
-        </div>
-
-        {/* Text Input */}
-        <div className="input-section animate-slide-up" style={{ animationDelay: '0.7s' }}>
-          <label className="input-label">
-            Proof Data (JSON or patricon:// URL)
-          </label>
-          <textarea
-            value={proofInput}
-            onChange={handleProofInput}
-            placeholder="Paste proof JSON data or scan QR code..."
-            className="proof-textarea hover:shadow-xl focus:shadow-2xl focus:ring-4 focus:ring-cyan-400/30 transition-all duration-300"
-          />
-        </div>
-
-        {/* Verify Button */}
-        <button
-          onClick={verifyProof}
-          disabled={!proofInput.trim() || !isInitialized || isVerifying}
-          className="verify-btn group/btn hover:scale-110 hover:shadow-2xl transition-all duration-300 animate-scale-in"
-          style={{ animationDelay: '0.8s' }}
-        >
-          {isVerifying ? (
-            <>
-              <div className="loading-spinner animate-spin"></div>
-              <span className="animate-pulse">Verifying Proof...</span>
-            </>
-          ) : (
-            <>
-              <Shield className="verify-icon group-hover/btn:scale-125 group-hover/btn:rotate-12 transition-all duration-300" />
-              <span>Verify Proof Locally</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Verification Result */}
-      {verificationResult && (
-        <div className={`verification-result animate-scale-in ${
-          verificationResult.isValid 
-            ? 'verification-success bg-gradient-to-br from-green-50/80 to-emerald-50/80 border-green-200' 
-            : 'verification-error bg-gradient-to-br from-red-50/80 to-rose-50/80 border-red-200'
-        }`}>
-          <div className="verification-header">
-            {verificationResult.isValid ? (
+          {/* Verify Button */}
+          <button
+            onClick={verifyProof}
+            disabled={!proofInput.trim() || !isInitialized || isVerifying}
+            className={`w-full mt-6 btn-primary text-base font-semibold text-white px-8 py-3 rounded-lg flex items-center justify-center space-x-2 transition-all duration-300 ${
+              (!proofInput.trim() || !isInitialized || isVerifying) 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:shadow-[0_0_20px_rgba(79,70,229,0.6)]'
+            }`}
+          >
+            {isVerifying ? (
               <>
-                <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full animate-bounce">
-                  <Check className="verification-icon verification-success-icon text-green-600" />
-                </div>
-                <h2 className="verification-title bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                  Proof Valid ✅
-                </h2>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Verifying Proof...</span>
               </>
             ) : (
               <>
-                <div className="p-4 bg-gradient-to-br from-red-500/20 to-rose-500/20 rounded-full animate-pulse">
-                  <X className="verification-icon verification-error-icon text-red-600" />
-                </div>
-                <h2 className="verification-title bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
-                  Proof Invalid ❌
-                </h2>
+                <Shield className="w-5 h-5" />
+                <span>Verify Proof Locally</span>
               </>
             )}
-          </div>
+          </button>
+        </div>
 
-          {verificationResult.error && (
-            <div className="error-message animate-slide-in-left">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
-              <p>Error: {verificationResult.error}</p>
+        {/* Verification Result */}
+        {verificationResult && (
+          <div className={`glass-card-elevated rounded-2xl p-6 md:p-8 ${
+            verificationResult.isValid 
+              ? 'border-green-500/50' 
+              : 'border-red-500/50'
+          }`}>
+            <div className="flex items-center space-x-3 mb-6">
+              {verificationResult.isValid ? (
+                <>
+                  <CheckCircle className="w-6 h-6 text-green-400" />
+                  <h2 className="text-xl font-semibold text-white">Proof Valid ✅</h2>
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-6 h-6 text-red-400" />
+                  <h2 className="text-xl font-semibold text-white">Proof Invalid ❌</h2>
+                </>
+              )}
             </div>
-          )}
 
-          {verificationResult.proof && verificationResult.isValid && (
-            <div className="verification-details">
-              <div className="proof-metadata">
-                <div className="metadata-item">
-                  <label className="metadata-label">Proof Type</label>
-                  <p className="metadata-value">
-                    {proofTypeNames[parseInt(verificationResult.proof.public_signals[0]) as keyof typeof proofTypeNames] || 'Unknown'}
-                  </p>
+            {verificationResult.error && (
+              <div className="flex items-center space-x-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg mb-6 text-red-400">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                <span className="text-sm">Error: {verificationResult.error}</span>
+              </div>
+            )}
+
+            {verificationResult.proof && verificationResult.isValid && (
+              <div className="space-y-6">
+                {/* Proof Metadata */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <span className="text-sm text-gray-400">Proof Type:</span>
+                    <p className="text-white font-medium">
+                      {proofTypeNames[parseInt(verificationResult.proof.public_signals[0]) as keyof typeof proofTypeNames] || 'Unknown'}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <span className="text-sm text-gray-400">Generated:</span>
+                    <p className="text-white font-medium">
+                      {new Date(verificationResult.proof.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <span className="text-sm text-gray-400">Nullifier Hash:</span>
+                    <p className="text-white font-mono text-xs">
+                      {verificationResult.proof.nullifier_hash.substring(0, 20)}...
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <span className="text-sm text-gray-400">Passkey Signed:</span>
+                    <p className="text-white font-medium">
+                      {verificationResult.proof.signature.includes('passkey_sig') ? '✅ Yes' : '❌ No'}
+                    </p>
+                  </div>
                 </div>
-                <div className="metadata-item">
-                  <label className="metadata-label">Generated</label>
-                  <p className="metadata-value">
-                    {new Date(verificationResult.proof.timestamp).toLocaleString()}
-                  </p>
-                </div>
-                <div className="metadata-item">
-                  <label className="metadata-label">Nullifier Hash</label>
-                  <p className="metadata-value metadata-hash">
-                    {verificationResult.proof.nullifier_hash.substring(0, 20)}...
-                  </p>
-                </div>
-                <div className="metadata-item">
-                  <label className="metadata-label">Passkey Signed</label>
-                  <p className="metadata-value">
-                    {verificationResult.proof.signature.includes('passkey_sig') ? '✅ Yes' : '❌ No'}
-                  </p>
+
+                {/* Verification Checks */}
+                <div className="glass-card p-4 rounded-xl">
+                  <h3 className="font-semibold text-white mb-3">Verification Checks</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 text-green-400">
+                      <Check className="w-4 h-4" />
+                      <span className="text-sm">ZK proof mathematically valid</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-green-400">
+                      <Check className="w-4 h-4" />
+                      <span className="text-sm">Passkey signature verified</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-green-400">
+                      <Check className="w-4 h-4" />
+                      <span className="text-sm">Nullifier fresh (no replay)</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-green-400">
+                      <Check className="w-4 h-4" />
+                      <span className="text-sm">Proof non-transferable</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+            )}
+          </div>
+        )}
 
-              <div className="verification-checks">
-                <h3 className="checks-title">Verification Checks</h3>
-                <ul className="checks-list">
-                  <li className="check-item check-success">
-                    <Check className="check-icon" />
-                    <span>ZK proof mathematically valid</span>
-                  </li>
-                  <li className="check-item check-success">
-                    <Check className="check-icon" />
-                    <span>Passkey signature verified</span>
-                  </li>
-                  <li className="check-item check-success">
-                    <Check className="check-icon" />
-                    <span>Nullifier fresh (no replay)</span>
-                  </li>
-                  <li className="check-item check-success">
-                    <Check className="check-icon" />
-                    <span>Proof non-transferable</span>
-                  </li>
-                </ul>
-              </div>
+        {/* How It Works */}
+        <div className="glass-card rounded-2xl p-6 md:p-8">
+          <h2 className="text-xl font-semibold text-white mb-6">How P2P Verification Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <h3 className="font-medium text-white">Client-Side Verification</h3>
+              <ul className="space-y-1 text-sm text-gray-400">
+                <li>• ZK proof verified using circuit verifier</li>
+                <li>• No backend or server required</li>
+                <li>• Mathematical proof of claims</li>
+                <li>• Privacy-preserving (no data revealed)</li>
+              </ul>
             </div>
-          )}
-        </div>
-      )}
-
-      {/* How It Works */}
-      <div className="info-section">
-        <div className="section-header">
-          <h2 className="section-title">How P2P Verification Works</h2>
-        </div>
-        <div className="info-grid">
-          <div className="info-card">
-            <h3 className="info-card-title">Client-Side Verification</h3>
-            <ul className="info-list">
-              <li>• ZK proof verified using circuit verifier</li>
-              <li>• No backend or server required</li>
-              <li>• Mathematical proof of claims</li>
-              <li>• Privacy-preserving (no data revealed)</li>
-            </ul>
-          </div>
-          <div className="info-card">
-            <h3 className="info-card-title">Anti-Transfer Protection</h3>
-            <ul className="info-list">
-              <li>• Passkey/biometric signature binding</li>
-              <li>• Nullifier prevents proof reuse</li>
-              <li>• Device-bound authentication</li>
-              <li>• Non-transferable credentials</li>
-            </ul>
+            <div className="space-y-3">
+              <h3 className="font-medium text-white">Anti-Transfer Protection</h3>
+              <ul className="space-y-1 text-sm text-gray-400">
+                <li>• Passkey/biometric signature binding</li>
+                <li>• Nullifier prevents proof reuse</li>
+                <li>• Device-bound authentication</li>
+                <li>• Non-transferable credentials</li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Privacy Notice */}
-      <div className="privacy-notice">
-        <div className="privacy-content">
-          <AlertTriangle className="privacy-icon" />
-          <div className="privacy-text">
-            <h3 className="privacy-title">P2P Privacy Guarantee</h3>
-            <p className="privacy-description">
-              All verification happens locally in your browser. No personal data is transmitted, 
-              and proofs are cryptographically bound to prevent sharing or transfer.
-            </p>
+        {/* Privacy Notice */}
+        <div className="glass-card rounded-2xl p-6 md:p-8 border-cyan-500/30">
+          <div className="flex items-start space-x-3">
+            <Shield className="w-6 h-6 text-cyan-400 mt-1 flex-shrink-0" />
+            <div>
+              <h3 className="font-semibold text-white mb-2">P2P Privacy Guarantee</h3>
+              <p className="text-sm text-gray-400">
+                🔒 All verification happens locally in your browser. No personal data is transmitted, 
+                and proofs are cryptographically bound to prevent sharing or transfer.
+              </p>
+            </div>
           </div>
         </div>
       </div>
