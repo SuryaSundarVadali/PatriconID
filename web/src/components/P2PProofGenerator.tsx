@@ -204,41 +204,48 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
   }
 
   return (
-    <div className="proof-generator-container">
-      <div className="proof-section-header">
+    <div className="proof-generator-container animate-fade-in">
+      <div className="proof-section-header animate-slide-up">
         <div className="section-title-wrapper">
-          <Shield className="section-icon" size={24} />
-          <h2 className="section-title">P2P Identity Proof Generator</h2>
+          <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl backdrop-blur-sm border border-purple-200/30 animate-pulse-glow">
+            <Shield className="section-icon text-purple-600" size={24} />
+          </div>
+          <h2 className="section-title">
+            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              P2P Identity Proof Generator
+            </span>
+          </h2>
         </div>
-        <p className="section-description">
+        <p className="section-description animate-slide-up delay-100">
           Generate zero-knowledge proofs locally with mathematical privacy guarantees
         </p>
       </div>
 
       {/* Service Status */}
-      <div className="status-card">
-        <h3 className="status-title">
-          <Send size={20} />
+      <div className="status-card group hover:shadow-2xl transition-all duration-500 animate-slide-up delay-200">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+        <h3 className="status-title relative z-10">
+          <Send size={20} className="text-purple-600" />
           Service Status
         </h3>
-        <div className="status-indicators">
-          <div className="status-item">
-            <div className={`status-dot ${isInitialized ? 'status-active' : 'status-pending'}`} />
+        <div className="status-indicators relative z-10">
+          <div className="status-item group/item hover:scale-105 transition-transform duration-300">
+            <div className={`status-dot ${isInitialized ? 'status-active animate-pulse' : 'status-pending animate-pulse-glow'}`} />
             <span className="status-label">
-              P2P Service: {isInitialized ? 'Ready' : 'Initializing...'}
+              P2P Service: <span className={isInitialized ? 'text-green-600 font-semibold' : 'text-orange-500'}>{isInitialized ? 'Ready ✓' : 'Initializing...'}</span>
             </span>
           </div>
-          <div className="status-item">
-            <div className={`status-dot ${passkeyBound ? 'status-active' : 'status-inactive'}`} />
+          <div className="status-item group/item hover:scale-105 transition-transform duration-300">
+            <div className={`status-dot ${passkeyBound ? 'status-active animate-pulse' : 'status-inactive'}`} />
             <span className="status-label">
-              Passkey Binding: {passkeyBound ? 'Bound' : 'Not Bound'}
+              Passkey Binding: <span className={passkeyBound ? 'text-green-600 font-semibold' : 'text-gray-500'}>{passkeyBound ? 'Bound ✓' : 'Not Bound'}</span>
             </span>
             {!passkeyBound && (
               <button
                 onClick={bindPasskey}
-                className="bind-passkey-btn"
+                className="bind-passkey-btn group/btn hover:scale-110 hover:shadow-xl transition-all duration-300"
               >
-                <Send size={16} />
+                <Send size={16} className="group-hover/btn:rotate-12 transition-transform duration-300" />
                 Bind Passkey
               </button>
             )}
@@ -247,50 +254,53 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
       </div>
 
       {/* Document Upload/Scan */}
-      <div className="proof-step-card">
+      <div className="proof-step-card animate-slide-up delay-300">
         <div className="step-header">
-          <div className="step-number">1</div>
+          <div className="step-number bg-gradient-to-br from-purple-500 to-purple-600 shadow-xl animate-pulse-glow">1</div>
           <h3 className="step-title">Scan or Upload ID Document</h3>
         </div>
         <div className="step-content">
           <div className="upload-methods">
             {/* Aadhaar XML Upload - Recommended for India */}
-            <div className="upload-method-card highlighted">
-              <FileText className="upload-icon" />
-              <h4 className="upload-method-title">Aadhaar XML (India)</h4>
-              <p className="upload-method-description">
+            <div className="upload-method-card highlighted group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in" style={{ animationDelay: '0.4s' }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <FileText className="upload-icon text-purple-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 relative z-10" />
+              <h4 className="upload-method-title relative z-10">Aadhaar XML (India)</h4>
+              <p className="upload-method-description relative z-10">
                 Upload offline e-KYC XML with UIDAI digital signature verification
               </p>
               <button 
-                className="upload-btn primary"
+                className="upload-btn primary group/btn hover:scale-110 hover:shadow-xl transition-all duration-300 relative z-10"
                 onClick={() => {
                   const modal = document.getElementById('aadhaar-modal');
                   if (modal) modal.style.display = 'block';
                 }}
               >
-                <Shield size={16} />
+                <Shield size={16} className="group-hover/btn:rotate-12 transition-transform duration-300" />
                 Upload Aadhaar XML
               </button>
             </div>
 
             {/* NFC Scan */}
-            <div className="upload-method-card" onClick={handleNFCScan}>
-              <Smartphone className="upload-icon" />
-              <h4 className="upload-method-title">NFC Scan</h4>
-              <p className="upload-method-description">
+            <div className="upload-method-card group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in" style={{ animationDelay: '0.5s' }} onClick={handleNFCScan}>
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <Smartphone className="upload-icon text-cyan-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 relative z-10" />
+              <h4 className="upload-method-title relative z-10">NFC Scan</h4>
+              <p className="upload-method-description relative z-10">
                 Tap your NFC-enabled passport or ID card for secure data extraction
               </p>
-              <button className="upload-btn">
-                <Scan size={16} />
+              <button className="upload-btn group/btn hover:scale-110 hover:shadow-xl transition-all duration-300 relative z-10">
+                <Scan size={16} className="group-hover/btn:scale-125 transition-transform duration-300" />
                 Start NFC Scan
               </button>
             </div>
 
             {/* File Upload */}
-            <div className="upload-method-card">
-              <Camera className="upload-icon" />
-              <h4 className="upload-method-title">Upload Photo</h4>
-              <p className="upload-method-description">
+            <div className="upload-method-card group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in" style={{ animationDelay: '0.6s' }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+              <Camera className="upload-icon text-orange-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 relative z-10" />
+              <h4 className="upload-method-title relative z-10">Upload Photo</h4>
+              <p className="upload-method-description relative z-10">
                 Upload a clear photo of your document for OCR processing
               </p>
               <input
@@ -301,12 +311,12 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
                 id="document-upload"
                 style={{ display: 'none' }}
               />
-              <label htmlFor="document-upload" className="upload-btn secondary">
-                <Camera size={16} />
+              <label htmlFor="document-upload" className="upload-btn secondary group/btn hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer relative z-10">
+                <Camera size={16} className="group-hover/btn:scale-125 transition-transform duration-300" />
                 Choose File
               </label>
               {selectedFile && (
-                <div className="file-selected">✓ {selectedFile.name}</div>
+                <div className="file-selected animate-slide-in-left relative z-10">✓ {selectedFile.name}</div>
               )}
             </div>
           </div>
@@ -340,21 +350,28 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
       </div>
 
       {/* Proof Type Selection */}
-      <div className="proof-step-card">
+      <div className="proof-step-card animate-slide-up delay-300">
         <div className="step-header">
-          <div className="step-number">2</div>
+          <div className="step-number bg-gradient-to-br from-pink-500 to-rose-600 shadow-xl animate-pulse-glow">2</div>
           <h3 className="step-title">Select Proof Type</h3>
         </div>
         <div className="step-content">
           <div className="proof-types-grid">
-            {proofTypes.map((type) => (
+            {proofTypes.map((type, index) => (
               <div
                 key={type.id}
-                className={`proof-type-card ${proofType === type.id ? 'selected' : ''}`}
+                className={`proof-type-card group hover:scale-105 transition-all duration-500 animate-scale-in ${proofType === type.id ? 'selected ring-4 ring-purple-400/50 shadow-2xl' : ''}`}
                 onClick={() => setProofType(type.id)}
+                style={{ animationDelay: `${0.7 + index * 0.1}s` }}
               >
-                <h4 className="proof-type-name">{type.name}</h4>
-                <p className="proof-type-description">{type.description}</p>
+                <div className={`absolute inset-0 ${proofType === type.id ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20' : 'bg-gradient-to-br from-gray-500/5 to-transparent group-hover:from-purple-500/10 group-hover:to-pink-500/10'} transition-all duration-500 rounded-2xl`}></div>
+                <h4 className="proof-type-name relative z-10">{type.name}</h4>
+                <p className="proof-type-description relative z-10">{type.description}</p>
+                {proofType === type.id && (
+                  <div className="absolute top-4 right-4 z-20">
+                    <Check className="w-6 h-6 text-purple-600 animate-scale-in" />
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -362,9 +379,9 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
       </div>
 
       {/* Generate Proof */}
-      <div className="proof-step-card">
+      <div className="proof-step-card animate-slide-up delay-300">
         <div className="step-header">
-          <div className="step-number">3</div>
+          <div className="step-number bg-gradient-to-br from-cyan-500 to-blue-600 shadow-xl animate-pulse-glow">3</div>
           <h3 className="step-title">Generate ZK Proof</h3>
         </div>
         <div className="step-content">
@@ -372,16 +389,16 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
             <button
               onClick={generateProof}
               disabled={!selectedFile || !isInitialized || isGenerating}
-              className={`primary-btn ${(!selectedFile || !isInitialized || isGenerating) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`primary-btn group/btn hover:scale-110 hover:shadow-2xl transition-all duration-300 ${(!selectedFile || !isInitialized || isGenerating) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isGenerating ? (
                 <>
-                  <div className="loading-spinner-inline"></div>
-                  <span>Generating Proof...</span>
+                  <div className="loading-spinner-inline animate-spin"></div>
+                  <span className="animate-pulse">Generating Proof...</span>
                 </>
               ) : (
                 <>
-                  <Shield size={20} />
+                  <Shield size={20} className="group-hover/btn:rotate-12 transition-transform duration-300" />
                   <span>Generate ZK Proof</span>
                 </>
               )}
@@ -392,31 +409,34 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
 
       {/* Proof Result & P2P Sharing */}
       {generatedProof && (
-        <div className="proof-step-card">
+        <div className="proof-step-card animate-scale-in bg-gradient-to-br from-green-50/50 to-emerald-50/50 border-green-200/50">
           <div className="step-header">
-            <div className="step-number">4</div>
-            <h3 className="step-title">Share Proof (P2P)</h3>
+            <div className="step-number bg-gradient-to-br from-green-500 to-emerald-600 shadow-xl animate-pulse">4</div>
+            <h3 className="step-title flex items-center gap-2">
+              Share Proof (P2P)
+              <Check className="w-6 h-6 text-green-600 animate-bounce" />
+            </h3>
           </div>
           <div className="step-content">
             {/* Proof Details */}
-            <div className="status-card">
+            <div className="status-card bg-white/80 backdrop-blur-xl border-green-200/50 animate-slide-up">
               <div className="status-indicators">
                 <div className="status-item">
-                  <Check className="status-dot status-active" size={16} />
-                  <span className="status-label">Proof Generated Successfully</span>
+                  <Check className="status-dot status-active animate-pulse" size={16} />
+                  <span className="status-label text-green-700 font-semibold">Proof Generated Successfully ✓</span>
                 </div>
               </div>
               <div className="proof-details">
-                <div className="proof-detail-item">
+                <div className="proof-detail-item animate-slide-in-left" style={{ animationDelay: '0.1s' }}>
                   <strong>Proof Type:</strong> {proofTypes.find(t => t.id === proofType)?.name}
                 </div>
-                <div className="proof-detail-item">
+                <div className="proof-detail-item animate-slide-in-left" style={{ animationDelay: '0.2s' }}>
                   <strong>Generated:</strong> {new Date(generatedProof.timestamp).toLocaleString()}
                 </div>
-                <div className="proof-detail-item">
+                <div className="proof-detail-item animate-slide-in-left" style={{ animationDelay: '0.3s' }}>
                   <strong>Nullifier:</strong> {generatedProof.nullifier_hash.substring(0, 16)}...
                 </div>
-                <div className="proof-detail-item">
+                <div className="proof-detail-item animate-slide-in-left" style={{ animationDelay: '0.4s' }}>
                   <strong>Passkey Signed:</strong> ✅
                 </div>
               </div>
@@ -426,17 +446,19 @@ const P2PProofGenerator: React.FC<P2PProofGeneratorProps> = ({ onProofGenerated 
             <div className="sharing-methods">
               <button
                 onClick={downloadProof}
-                className="secondary-btn"
+                className="secondary-btn group/btn hover:scale-110 hover:shadow-2xl transition-all duration-300 animate-scale-in"
+                style={{ animationDelay: '0.5s' }}
               >
-                <Download size={20} />
+                <Download size={20} className="group-hover/btn:scale-125 group-hover/btn:-translate-y-1 transition-all duration-300" />
                 <span>Download Proof</span>
               </button>
               
               <button
                 onClick={() => sendProofP2P('qr')}
-                className="secondary-btn"
+                className="secondary-btn group/btn hover:scale-110 hover:shadow-2xl transition-all duration-300 animate-scale-in"
+                style={{ animationDelay: '0.6s' }}
               >
-                <Smartphone size={20} />
+                <Smartphone size={20} className="group-hover/btn:scale-125 group-hover/btn:rotate-6 transition-all duration-300" />
                 <span>Share via QR Code</span>
               </button>
               

@@ -95,73 +95,73 @@ export function Web3ProofDashboard() {
       
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="p-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border border-white/10">
-              <Shield className="h-12 w-12 text-purple-300" />
+        <div className="text-center mb-12 animate-fade-in">
+          <div className="flex items-center justify-center gap-4 mb-6 animate-slide-up">
+            <div className="p-4 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border border-white/10 animate-pulse-glow">
+              <Shield className="h-12 w-12 text-purple-300 animate-float" />
             </div>
             <div className="text-left">
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent mb-2">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent mb-2 animate-slide-in-left">
                 Web3 Identity
               </h1>
-              <p className="text-xl text-purple-300/80">Blockchain-verified zero-knowledge proofs</p>
+              <p className="text-xl text-purple-300/80 animate-slide-in-left delay-100">Blockchain-verified zero-knowledge proofs</p>
             </div>
           </div>
-          <p className="text-lg text-purple-200/70 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg text-purple-200/70 max-w-4xl mx-auto leading-relaxed animate-slide-up delay-200">
             Generate cryptographic identity proofs and verify them on-chain using smart contracts. 
             Your privacy is mathematically guaranteed through zero-knowledge technology.
           </p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-2 inline-flex shadow-2xl">
+        <div className="flex justify-center mb-12 animate-scale-in delay-300">
+          <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-2 inline-flex shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
             <button
               onClick={() => setActiveTab('generate')}
-              className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 ${
+              className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 hover:scale-105 ${
                 activeTab === 'generate'
                   ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-xl transform scale-105'
                   : 'text-purple-300 hover:text-white hover:bg-white/5'
               }`}
             >
-              <div className={`p-1 rounded-lg ${
-                activeTab === 'generate' ? 'bg-white/20' : 'bg-purple-500/20'
+              <div className={`p-1 rounded-lg transition-all duration-300 ${
+                activeTab === 'generate' ? 'bg-white/20 animate-pulse-glow' : 'bg-purple-500/20'
               }`}>
-                <Shield className="h-4 w-4" />
+                <Shield className={`h-4 w-4 ${activeTab === 'generate' ? 'animate-pulse' : ''}`} />
               </div>
               Generate Proof
             </button>
             <button
               onClick={() => setActiveTab('verify')}
-              className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 ${
+              className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 hover:scale-105 ${
                 activeTab === 'verify'
                   ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-xl transform scale-105'
                   : 'text-purple-300 hover:text-white hover:bg-white/5'
               }`}
             >
-              <div className={`p-1 rounded-lg ${
-                activeTab === 'verify' ? 'bg-white/20' : 'bg-blue-500/20'
+              <div className={`p-1 rounded-lg transition-all duration-300 ${
+                activeTab === 'verify' ? 'bg-white/20 animate-pulse-glow' : 'bg-blue-500/20'
               }`}>
-                <CheckCircle className="h-4 w-4" />
+                <CheckCircle className={`h-4 w-4 ${activeTab === 'verify' ? 'animate-pulse' : ''}`} />
               </div>
               Verify Proof
             </button>
             <button
               onClick={() => setActiveTab('web3')}
-              className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 ${
+              className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 hover:scale-105 ${
                 activeTab === 'web3'
                   ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-xl transform scale-105'
                   : 'text-purple-300 hover:text-white hover:bg-white/5'
               }`}
             >
-              <div className={`p-1 rounded-lg ${
-                activeTab === 'web3' ? 'bg-white/20' : 'bg-indigo-500/20'
+              <div className={`p-1 rounded-lg transition-all duration-300 ${
+                activeTab === 'web3' ? 'bg-white/20 animate-pulse-glow' : 'bg-indigo-500/20'
               }`}>
-                <Zap className="h-4 w-4" />
+                <Zap className={`h-4 w-4 ${activeTab === 'web3' ? 'animate-pulse' : ''}`} />
               </div>
               Web3 Wallet
               {isWeb3Connected && (
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
               )}
             </button>
           </div>
@@ -176,17 +176,18 @@ export function Web3ProofDashboard() {
                 
                 {/* Recent Proofs */}
                 {proofs.length > 0 && (
-                  <div className="relative overflow-hidden bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
+                  <div className="relative overflow-hidden bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-8 animate-slide-up delay-300 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5"></div>
                     <div className="relative z-10">
-                      <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent mb-6">
+                      <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent mb-6 animate-slide-in-left">
                         Generated Proofs
                       </h3>
                       <div className="space-y-4">
-                        {proofs.slice(0, 3).map((proof) => (
+                        {proofs.slice(0, 3).map((proof, index) => (
                           <div
                             key={proof.id}
-                            className="relative overflow-hidden bg-gradient-to-r from-gray-900/50 to-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 group hover:border-purple-400/30 transition-all duration-300"
+                            className="relative overflow-hidden bg-gradient-to-r from-gray-900/50 to-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 group hover:border-purple-400/30 hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 animate-scale-in"
+                            style={{ animationDelay: `${0.4 + index * 0.1}s` }}
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <div className="relative z-10">
@@ -214,9 +215,9 @@ export function Web3ProofDashboard() {
                                 <button
                                   onClick={() => verifyProofOnBlockchain(proof)}
                                   disabled={!isWeb3Connected}
-                                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
+                                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-110 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2 group/btn"
                                 >
-                                  <Zap className="h-4 w-4" />
+                                  <Zap className="h-4 w-4 group-hover/btn:scale-125 group-hover/btn:rotate-12 transition-all duration-300" />
                                   Verify On-Chain
                                 </button>
                               </div>
@@ -252,31 +253,31 @@ export function Web3ProofDashboard() {
 
             {activeTab === 'web3' && (
               <div className="space-y-8">
-                <div className="relative overflow-hidden bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
+                <div className="relative overflow-hidden bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-8 animate-fade-in hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5"></div>
                   <div className="relative z-10">
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent mb-4">
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent mb-4 animate-slide-up">
                       Web3 Integration
                     </h2>
-                    <p className="text-purple-200/80 mb-8 text-lg leading-relaxed">
+                    <p className="text-purple-200/80 mb-8 text-lg leading-relaxed animate-slide-up delay-100">
                       Connect your Web3 wallet to verify proofs on the blockchain using our deployed smart contract.
                       Experience the power of decentralized identity verification.
                     </p>
                     
                     {/* Connection Status Banner */}
-                    <div className={`relative overflow-hidden backdrop-blur-sm border rounded-2xl p-6 mb-8 ${
+                    <div className={`relative overflow-hidden backdrop-blur-sm border rounded-2xl p-6 mb-8 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl animate-scale-in delay-200 ${
                       isWeb3Connected 
-                        ? 'bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-green-500/30' 
-                        : 'bg-gradient-to-r from-yellow-900/40 to-orange-900/40 border-yellow-500/30'
+                        ? 'bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-green-500/30 hover:shadow-green-500/20' 
+                        : 'bg-gradient-to-r from-yellow-900/40 to-orange-900/40 border-yellow-500/30 hover:shadow-yellow-500/20'
                     }`}>
                       <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-full ${
+                        <div className={`p-3 rounded-full transition-all duration-300 hover:scale-110 ${
                           isWeb3Connected 
                             ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20' 
                             : 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20'
                         }`}>
                           <div className={`w-4 h-4 rounded-full animate-pulse ${
-                            isWeb3Connected ? 'bg-green-400' : 'bg-yellow-400'
+                            isWeb3Connected ? 'bg-green-400 shadow-lg shadow-green-400/50' : 'bg-yellow-400 shadow-lg shadow-yellow-400/50'
                           }`}></div>
                         </div>
                         <div>
@@ -324,9 +325,10 @@ export function Web3ProofDashboard() {
                           description: "Smart contract verification uses minimal gas for cost efficiency"
                         }
                       ].map((feature, index) => (
-                        <div key={index} className="bg-gradient-to-r from-gray-900/50 to-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 group hover:border-purple-400/30 transition-all duration-300">
-                          <div className="flex items-start gap-4">
-                            <div className="p-2 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                        <div key={index} className="bg-gradient-to-r from-gray-900/50 to-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 group hover:border-purple-400/30 hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"></div>
+                          <div className="flex items-start gap-4 relative z-10">
+                            <div className="p-2 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                               <div className="text-purple-300">
                                 {feature.icon}
                               </div>

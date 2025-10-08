@@ -207,37 +207,44 @@ const P2PProofVerifier: React.FC = () => {
   }
 
   return (
-    <div className="proof-verifier-container">
-      <div className="proof-section-header">
+    <div className="proof-verifier-container animate-fade-in">
+      <div className="proof-section-header animate-slide-up">
         <div className="section-title-wrapper">
-          <Eye className="section-icon" size={24} />
-          <h2 className="section-title">P2P Proof Verifier</h2>
+          <div className="p-3 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border border-cyan-200/30 animate-pulse-glow">
+            <Eye className="section-icon text-cyan-600" size={24} />
+          </div>
+          <h2 className="section-title">
+            <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+              P2P Proof Verifier
+            </span>
+          </h2>
         </div>
-        <p className="section-description">
+        <p className="section-description animate-slide-up delay-100">
           Verify zero-knowledge proofs locally with cryptographic guarantees
         </p>
       </div>
 
       {/* Service Status */}
-      <div className="status-card">
-        <h3 className="status-title">
-          <Shield size={20} />
+      <div className="status-card group hover:shadow-2xl transition-all duration-500 animate-slide-up delay-200">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+        <h3 className="status-title relative z-10">
+          <Shield size={20} className="text-cyan-600" />
           Verification Status
         </h3>
-        <div className="status-indicators">
-          <div className="status-item">
-            <div className={`status-dot ${isInitialized ? 'status-active' : 'status-pending'}`} />
+        <div className="status-indicators relative z-10">
+          <div className="status-item hover:scale-105 transition-transform duration-300">
+            <div className={`status-dot ${isInitialized ? 'status-active animate-pulse' : 'status-pending animate-pulse-glow'}`} />
             <span className="status-label">
-              P2P Verifier: {isInitialized ? 'Ready' : 'Initializing...'}
+              P2P Verifier: <span className={isInitialized ? 'text-green-600 font-semibold' : 'text-orange-500'}>{isInitialized ? 'Ready ✓' : 'Initializing...'}</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* Proof Input Methods */}
-      <div className="proof-step-card">
+      <div className="proof-step-card animate-slide-up delay-300">
         <div className="step-header">
-          <div className="step-number">1</div>
+          <div className="step-number bg-gradient-to-br from-cyan-500 to-blue-600 shadow-xl animate-pulse-glow">1</div>
           <div className="step-content">
             <h3 className="step-title">Input Proof for Verification</h3>
             <p className="step-description">Provide the zero-knowledge proof to verify</p>
@@ -249,24 +256,27 @@ const P2PProofVerifier: React.FC = () => {
           <button
             onClick={openQRScanner}
             disabled={qrScannerOpen}
-            className="upload-method-btn"
+            className="upload-method-btn group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in"
+            style={{ animationDelay: '0.4s' }}
           >
-            <Scan className="upload-icon" />
-            <span>{qrScannerOpen ? 'Scanning...' : 'Scan QR Code'}</span>
+            <Scan className="upload-icon text-cyan-600 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+            <span>{qrScannerOpen ? '🔄 Scanning...' : 'Scan QR Code'}</span>
           </button>
 
           <div 
-            className={`upload-method-btn upload-file-btn ${isDragOver ? 'drag-over' : ''} ${uploadStatus}`}
+            className={`upload-method-btn upload-file-btn group hover:scale-105 hover:shadow-2xl transition-all duration-500 animate-scale-in ${isDragOver ? 'drag-over ring-4 ring-cyan-400/50 scale-105' : ''} ${uploadStatus}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            style={{ animationDelay: '0.5s' }}
           >
-            <Upload className="upload-icon" />
-            <span>
-              {uploadStatus === 'uploading' ? 'Uploading...' :
+            <div className={`absolute inset-0 ${isDragOver ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20' : 'bg-gradient-to-br from-cyan-500/0 to-blue-500/0 group-hover:from-cyan-500/10 group-hover:to-blue-500/10'} transition-all duration-500 rounded-2xl`}></div>
+            <Upload className={`upload-icon relative z-10 ${uploadStatus === 'success' ? 'text-green-600' : uploadStatus === 'error' ? 'text-red-600' : 'text-blue-600'} group-hover:scale-110 transition-all duration-300`} />
+            <span className="relative z-10">
+              {uploadStatus === 'uploading' ? '⏳ Uploading...' :
                uploadStatus === 'success' ? `✓ ${uploadedFileName}` :
-               uploadStatus === 'error' ? 'Upload Failed' :
-               isDragOver ? 'Drop file here' : 'Upload Proof File'}
+               uploadStatus === 'error' ? '❌ Upload Failed' :
+               isDragOver ? '📥 Drop file here' : 'Upload Proof File'}
             </span>
             <input
               type="file"
@@ -278,19 +288,19 @@ const P2PProofVerifier: React.FC = () => {
 
           {/* Upload Status Messages */}
           {uploadError && (
-            <div className="upload-error-message">
+            <div className="upload-error-message animate-slide-in-left">
               <AlertTriangle size={16} />
               <span>{uploadError}</span>
             </div>
           )}
 
-          <div className="upload-method-btn upload-placeholder">
+          <div className="upload-method-btn upload-placeholder animate-scale-in" style={{ animationDelay: '0.6s' }}>
             <span>Or paste below</span>
           </div>
         </div>
 
         {/* Text Input */}
-        <div className="input-section">
+        <div className="input-section animate-slide-up" style={{ animationDelay: '0.7s' }}>
           <label className="input-label">
             Proof Data (JSON or patricon:// URL)
           </label>
@@ -298,7 +308,7 @@ const P2PProofVerifier: React.FC = () => {
             value={proofInput}
             onChange={handleProofInput}
             placeholder="Paste proof JSON data or scan QR code..."
-            className="proof-textarea"
+            className="proof-textarea hover:shadow-xl focus:shadow-2xl focus:ring-4 focus:ring-cyan-400/30 transition-all duration-300"
           />
         </div>
 
@@ -306,16 +316,17 @@ const P2PProofVerifier: React.FC = () => {
         <button
           onClick={verifyProof}
           disabled={!proofInput.trim() || !isInitialized || isVerifying}
-          className="verify-btn"
+          className="verify-btn group/btn hover:scale-110 hover:shadow-2xl transition-all duration-300 animate-scale-in"
+          style={{ animationDelay: '0.8s' }}
         >
           {isVerifying ? (
             <>
-              <div className="loading-spinner"></div>
-              <span>Verifying Proof...</span>
+              <div className="loading-spinner animate-spin"></div>
+              <span className="animate-pulse">Verifying Proof...</span>
             </>
           ) : (
             <>
-              <Shield className="verify-icon" />
+              <Shield className="verify-icon group-hover/btn:scale-125 group-hover/btn:rotate-12 transition-all duration-300" />
               <span>Verify Proof Locally</span>
             </>
           )}
@@ -324,27 +335,36 @@ const P2PProofVerifier: React.FC = () => {
 
       {/* Verification Result */}
       {verificationResult && (
-        <div className={`verification-result ${
+        <div className={`verification-result animate-scale-in ${
           verificationResult.isValid 
-            ? 'verification-success' 
-            : 'verification-error'
+            ? 'verification-success bg-gradient-to-br from-green-50/80 to-emerald-50/80 border-green-200' 
+            : 'verification-error bg-gradient-to-br from-red-50/80 to-rose-50/80 border-red-200'
         }`}>
           <div className="verification-header">
             {verificationResult.isValid ? (
               <>
-                <Check className="verification-icon verification-success-icon" />
-                <h2 className="verification-title">Proof Valid ✅</h2>
+                <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full animate-bounce">
+                  <Check className="verification-icon verification-success-icon text-green-600" />
+                </div>
+                <h2 className="verification-title bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  Proof Valid ✅
+                </h2>
               </>
             ) : (
               <>
-                <X className="verification-icon verification-error-icon" />
-                <h2 className="verification-title">Proof Invalid ❌</h2>
+                <div className="p-4 bg-gradient-to-br from-red-500/20 to-rose-500/20 rounded-full animate-pulse">
+                  <X className="verification-icon verification-error-icon text-red-600" />
+                </div>
+                <h2 className="verification-title bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+                  Proof Invalid ❌
+                </h2>
               </>
             )}
           </div>
 
           {verificationResult.error && (
-            <div className="error-message">
+            <div className="error-message animate-slide-in-left">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
               <p>Error: {verificationResult.error}</p>
             </div>
           )}

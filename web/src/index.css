@@ -50,17 +50,112 @@ button {
   border: 0;
 }
 
-/* Celestia-style animations */
+/* Beautiful Smooth Animations */
+@keyframes fade-in {
+  from { 
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes gradient-move {
-  0% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(40px) scale(1.05); }
-  100% { transform: translateY(0) scale(1); }
+  0%, 100% { 
+    transform: translate(0, 0) scale(1); 
+    opacity: 0.4;
+  }
+  33% { 
+    transform: translate(30px, -30px) scale(1.1);
+    opacity: 0.5;
+  }
+  66% { 
+    transform: translate(-30px, 30px) scale(0.95);
+    opacity: 0.45;
+  }
 }
 
 @keyframes gradient-move2 {
-  0% { transform: translateX(0) scale(1); }
-  50% { transform: translateX(-40px) scale(1.05); }
-  100% { transform: translateX(0) scale(1); }
+  0%, 100% { 
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% { 
+    transform: translate(-40px, 40px) scale(1.15) rotate(5deg); 
+    opacity: 0.8;
+  }
+}
+
+@keyframes gradient-move2 {
+  0%, 100% { 
+    transform: translateX(0) scale(1) rotate(0deg); 
+    opacity: 0.5;
+  }
+  50% { 
+    transform: translateX(-40px) scale(1.08) rotate(-2deg); 
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(183, 148, 246, 0.3),
+                0 0 40px rgba(183, 148, 246, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(183, 148, 246, 0.5),
+                0 0 60px rgba(183, 148, 246, 0.2);
+  }
+}
+
+@keyframes slide-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slide-in-left {
+  from { 
+    opacity: 0; 
+    transform: translateX(-30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes scale-in {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .animate-gradient-move {
@@ -69,6 +164,68 @@ button {
 
 .animate-gradient-move2 {
   animation: gradient-move2 10s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  background-size: 1000px 100%;
+  animation: shimmer 3s infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+/* Glassmorphism utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #b794f6, #e5a4ff, #ffd6a5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Smooth shadows */
+.shadow-smooth {
+  box-shadow: 0 8px 32px rgba(183, 148, 246, 0.15),
+              0 2px 8px rgba(183, 148, 246, 0.1);
+}
+
+.shadow-smooth-lg {
+  box-shadow: 0 16px 48px rgba(183, 148, 246, 0.2),
+              0 4px 16px rgba(183, 148, 246, 0.15);
 }
 
 @keyframes fade-in {
@@ -82,6 +239,9 @@ button {
 
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
 
 /* Celestia gradient background */
 .bg-celestia-gradient {
