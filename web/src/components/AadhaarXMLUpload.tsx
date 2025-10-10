@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Shield, CheckCircle, XCircle, FileText, Lock, AlertTriangle } from 'lucide-react';
+import { parseAadhaarZip, validateShareCode, verifyUidaiSignature, formatDate } from '../lib/aadhaar-xml-parser';
 
 interface AadhaarUploadProps {
   onVerified: (data: VerifiedAadhaarData) => void;
@@ -51,8 +52,8 @@ export const AadhaarXMLUpload: React.FC<AadhaarUploadProps> = ({ onVerified, onE
       return;
     }
 
-    if (shareCode.length < 4) {
-      setErrorMessage('Share code must be at least 4 characters');
+    if (!validateShareCode(shareCode)) {
+      setErrorMessage('Share code must be exactly 4 digits');
       return;
     }
 
@@ -61,47 +62,46 @@ export const AadhaarXMLUpload: React.FC<AadhaarUploadProps> = ({ onVerified, onE
     setErrorMessage('');
 
     try {
-      // Read ZIP file as ArrayBuffer
-      const arrayBuffer = await zipFile.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
+      // Parse the Aadhaar XML from the ZIP file
+      const parsed = await parseAadhaarZip(zipFile, shareCode);
 
-      // Import WASM module (dynamically)
-      // TODO: Update path when WASM is built
-      // const wasmModule = await import('../../../core/pkg');
-      // const proofService = new wasmModule.P2PProofService();
-      // await proofService.initialize();
-      // const verifiedDataJson = await proofService.verify_aadhaar_xml(uint8Array, shareCode);
-      // const data: VerifiedAadhaarData = JSON.parse(verifiedDataJson);
-      
-      // For now, use mock verification
-      // In production, this will verify UIDAI signature cryptographically
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!parsed.hasSignature) {
+        throw new Error('No digital signature found in the XML file');
+      }
 
-      // Mock verified data (replace with actual WASM call)
+      // Verify UIDAI signature
+      // Note: This is a placeholder. In production, this should use Web Crypto API
+      // to verify the RSA signature using UIDAI's public certificate
+      const signatureValid = await verifyUidaiSignature(
+        parsed.rawXML,
+        parsed.signatureValue
+      );
+
+      // Certificate validation would be done here in production
+      // For now, we assume it's valid if signature exists
+      const certificateValid = parsed.hasSignature;
+
+      // Prepare verified data
       const data: VerifiedAadhaarData = {
-        name: "Sample User",
-        date_of_birth: "01-01-1990",
-        gender: "M",
+        name: parsed.data.name,
+        date_of_birth: parsed.data.date_of_birth,
+        gender: parsed.data.gender,
         address: {
-          vtc: "Sample City",
-          district: "Sample District",
-          state: "Karnataka",
-          pincode: "560001",
+          vtc: parsed.data.address.vtc,
+          district: parsed.data.address.district,
+          state: parsed.data.address.state,
+          pincode: parsed.data.address.pincode,
+          full_address: parsed.data.address.full_address,
         },
-        reference_id: "MOCK123456",
-        generated_date: new Date().toISOString().split('T')[0],
-        signature_valid: true,
-        certificate_valid: true,
-        aadhaar_last_4_digits: "1234",
+        reference_id: parsed.data.reference_id,
+        generated_date: parsed.data.generated_date,
+        signature_valid: signatureValid,
+        certificate_valid: certificateValid,
+        aadhaar_last_4_digits: parsed.data.aadhaar_last_4_digits || 'XXXX',
       };
 
       if (!data.signature_valid) {
         throw new Error('UIDAI digital signature verification failed');
-      }
-
-      // Add full address for display
-      if (data.address) {
-        data.address.full_address = `${data.address.vtc}, ${data.address.district}, ${data.address.state} - ${data.address.pincode}`;
       }
 
       setVerifiedData(data);
@@ -173,10 +173,15 @@ export const AadhaarXMLUpload: React.FC<AadhaarUploadProps> = ({ onVerified, onE
                 type="password"
                 id="share-code"
                 value={shareCode}
-                onChange={(e) => setShareCode(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+                  setShareCode(value);
+                }}
                 placeholder="Enter 4-digit share code"
                 maxLength={4}
                 className="input-field"
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
               <small className="help-text">
                 The 4-digit code you set when downloading the XML

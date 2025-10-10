@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "p2p_selective_disclosure"
+]
+
+default-member = "p2p_selective_disclosure"

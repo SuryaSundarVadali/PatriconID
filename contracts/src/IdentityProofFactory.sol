@@ -2,8 +2,8 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /// @title IUltraVerifier - Interface for Noir ZK proof verifier
@@ -102,7 +102,6 @@ contract IdentityProofFactory is
     error NullifierAlreadyUsed();
     error ProofTypeNotSupported();
     error InsufficientStake();
-    error ProofExpired();
     error InvalidProofType();
     error UnauthorizedRevocation();
     error NoActiveProof();
@@ -123,7 +122,7 @@ contract IdentityProofFactory is
     
     /// @notice Initialize the contract (replaces constructor for upgradeable contracts)
     function initialize() external initializer {
-        __Ownable_init();
+        __Ownable_init(msg.sender);
         __Pausable_init();
         __ReentrancyGuard_init();
         __UUPSUpgradeable_init();

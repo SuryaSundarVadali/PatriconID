@@ -1,0 +1,7 @@
+[package]
+name = "text_identity_proof"
+type = "bin"
+authors = ["PatriconID Team"]
+compiler_version = ">=0.23.0"
+
+[dependencies]
